@@ -79,7 +79,7 @@ ai-resume-analyzer/
 
 ## Progress Log
 
-### ✅ Day 1: Environment setup
+### Day 1: Environment setup
 - Secured AWS account (root MFA, $10 budget alert)
 - Created IAM development user and configured AWS CLI
 - Verified Amazon Bedrock and Amazon Textract access in region
@@ -87,7 +87,7 @@ ai-resume-analyzer/
 - Scaffolded SAM project and deployed a hello-world API (API Gateway + Lambda)
 - Set up GitHub repository with `.gitignore`
 
-### ✅ Day 2: Storage layer
+### Day 2: Storage layer
 - Added private, encrypted S3 bucket with CORS and 30-day lifecycle
 - Added on-demand DynamoDB table with TTL
 - Validated and deployed with `sam validate`, `sam build`, `sam deploy`
