@@ -9,6 +9,11 @@ Globals:
     MemorySize: 128
     Architectures:
       - x86_64
+  Api:
+    Cors:
+      AllowMethods: "'GET,POST,OPTIONS'"
+      AllowHeaders: "'Content-Type'"
+      AllowOrigin: "'*'"
 
 Resources:
 
@@ -54,23 +59,38 @@ Resources:
         AttributeName: expiresAt
         Enabled: true
 
-  # ---------- Temporary: hello-world test function ----------
-  HelloWorldFunction:
+  # ---------- API: generate presigned upload URL ----------
+  GetUploadUrlFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: hello_world/
+      CodeUri: get_upload_url/
       Handler: app.lambda_handler
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref ResumesBucket
+          TABLE_NAME: !Ref ResultsTable
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action: s3:PutObject
+              Resource: !Sub "${ResumesBucket.Arn}/uploads/*"
+            - Effect: Allow
+              Action: dynamodb:PutItem
+              Resource: !GetAtt ResultsTable.Arn
       Events:
-        HelloWorld:
+        UploadUrl:
           Type: Api
           Properties:
-            Path: /hello
-            Method: get
+            Path: /upload-url
+            Method: post
 
 Outputs:
-  HelloWorldApi:
-    Description: Hello world test endpoint
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+  UploadUrlEndpoint:
+    Description: POST here to get a presigned upload URL
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/upload-url"
+  ApiBaseUrl:
+    Description: Base URL of the API
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
   ResumesBucketName:
     Description: S3 bucket for uploaded resumes
     Value: !Ref ResumesBucket
