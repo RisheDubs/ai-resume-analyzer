@@ -95,11 +95,19 @@ ai-resume-analyzer/
 - Tested DynamoDB put/get/delete from the CLI
 - Merged first feature branch via Pull Request
 
+### Day 3: Upload API
+- Built `GetUploadUrl` Lambda (Python, boto3) behind API Gateway `POST /upload-url`
+- Generates short-lived (5 min) S3 presigned URLs so browsers upload directly to S3
+- Validates file type (PDF, PNG, JPEG) and records a `PENDING` row in DynamoDB
+- Least-privilege IAM: function can only `PutObject` to `uploads/` and `PutItem` to the results table
+- Added `scripts/test_upload.py` for end-to-end testing
+- Removed temporary hello-world function
+
 ## Roadmap
 
 - [x] Project setup
 - [x] Storage (S3, DynamoDB)
-- [ ] Upload API (presigned URLs)
+- [x] Upload API (presigned URLs)
 - [ ] Text extraction (Textract)
 - [ ] AI analysis (Bedrock)
 - [ ] Results API
