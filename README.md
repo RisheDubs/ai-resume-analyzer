@@ -117,12 +117,20 @@ python scripts/test_upload.py <API_BASE_URL> sample-resumes/resume.pdf
 - Added `scripts/test_upload.py` and verified a real PDF upload end to end
 - Removed temporary hello-world function and its tests
 
+### Day 4: Text extraction (event-driven)
+- Added `ProcessResume` Lambda triggered automatically by S3 `ObjectCreated` events on `uploads/`
+- Images use synchronous Textract `DetectDocumentText`; multi-page PDFs use the async `StartDocumentTextDetection` job API with polling and result pagination
+- Status lifecycle in DynamoDB: `PENDING → PROCESSING → TEXT_EXTRACTED` or `FAILED` (with error message)
+- Errors are caught and recorded to avoid S3 retries causing duplicate Textract charges
+- Solved a CloudFormation circular dependency between the S3 bucket notification and the Lambda's IAM policy
+- Least-privilege IAM: `GetObject` on `uploads/*`, Textract text detection, `UpdateItem` on the results table
+
 ## Roadmap
 
 - [x] Project setup
 - [x] Storage (S3, DynamoDB)
 - [x] Upload API (presigned URLs)
-- [ ] Text extraction (Textract)
+- [x] Text extraction (Textract)
 - [ ] AI analysis (Bedrock)
 - [ ] Results API
 - [ ] Dashboard
@@ -148,7 +156,7 @@ The deploy output lists the API base URL, upload endpoint, S3 bucket name and Dy
 
 ### Tear down
 ```bash
-aws s3 rm s3://<your-bucket-name> --recursive
+aws s3 rm s3://ai-resume-analyzer-resumes-658586621994-us-east-1 --recursive
 sam delete
 ```
 
