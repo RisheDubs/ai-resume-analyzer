@@ -84,6 +84,44 @@ Resources:
             Path: /upload-url
             Method: post
 
+  # ---------- Processing: extract text when a resume is uploaded ----------
+  ProcessResumeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: process_resume/
+      Handler: app.lambda_handler
+      Timeout: 120
+      MemorySize: 256
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref ResultsTable
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action: s3:GetObject
+              # Built as a string (not !Ref ResumesBucket) to avoid a circular dependency
+              Resource: !Sub "arn:aws:s3:::ai-resume-analyzer-resumes-${AWS::AccountId}-${AWS::Region}/uploads/*"
+            - Effect: Allow
+              Action:
+                - textract:DetectDocumentText
+                - textract:StartDocumentTextDetection
+                - textract:GetDocumentTextDetection
+              Resource: "*"
+            - Effect: Allow
+              Action: dynamodb:UpdateItem
+              Resource: !GetAtt ResultsTable.Arn
+      Events:
+        ResumeUploaded:
+          Type: S3
+          Properties:
+            Bucket: !Ref ResumesBucket
+            Events: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: uploads/
+
 Outputs:
   UploadUrlEndpoint:
     Description: POST here to get a presigned upload URL
