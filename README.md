@@ -125,13 +125,23 @@ python scripts/test_upload.py <API_BASE_URL> sample-resumes/resume.pdf
 - Solved a CloudFormation circular dependency between the S3 bucket notification and the Lambda's IAM policy
 - Least-privilege IAM: `GetObject` on `uploads/*`, Textract text detection, `UpdateItem` on the results table
 
+### Day 5: AI analysis with Amazon Bedrock
+- Extended `ProcessResume` to send extracted text to an LLM via the Bedrock **Converse API** (model-agnostic; model ID set as a SAM parameter)
+- Prompt engineered for structured JSON: ATS score, section scores, strengths, missing keywords, improvements, recommended skills and a professional summary
+- Role-aware analysis using the user's target role and optional job description
+- Output validation layer: clamps scores to 0–100, enforces types and list sizes, retries once on invalid JSON
+- Prompt-injection mitigation: resume text treated as untrusted data inside delimiters
+- Logs latency and token usage per analysis for cost visibility
+- Status lifecycle: `PENDING → PROCESSING → TEXT_EXTRACTED → ANALYZING → DONE / FAILED`
+- Added `scripts/show_result.py` to inspect results
+
 ## Roadmap
 
 - [x] Project setup
 - [x] Storage (S3, DynamoDB)
 - [x] Upload API (presigned URLs)
 - [x] Text extraction (Textract)
-- [ ] AI analysis (Bedrock)
+- [x] AI analysis (Bedrock)
 - [ ] Results API
 - [ ] Dashboard
 - [ ] Security hardening & monitoring
