@@ -135,6 +135,15 @@ python scripts/test_upload.py <API_BASE_URL> sample-resumes/resume.pdf
 - Status lifecycle: `PENDING → PROCESSING → TEXT_EXTRACTED → ANALYZING → DONE / FAILED`
 - Added `scripts/show_result.py` to inspect results
 
+###  Day 6: Results API (backend complete)
+- Added `GetResult` Lambda behind `GET /results/{resumeId}`
+- Validates UUID format (400) and handles unknown IDs (404)
+- Returns status, `isComplete` flag and analysis; never exposes extracted resume text
+- DynamoDB projection expression and reserved-word aliasing; Decimal-safe JSON serialization
+- `Cache-Control: no-store` for correct polling behaviour
+- Least-privilege IAM: `GetItem` only
+- Upgraded `scripts/test_upload.py` to a full end-to-end test with polling and a formatted report
+
 ## Roadmap
 
 - [x] Project setup
