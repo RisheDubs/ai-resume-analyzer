@@ -1,4 +1,5 @@
 # AI Resume Analyzer
+** Live demo:** (https://d13hnc4jdk2cj2.cloudfront.net/)
 
 A cloud-native, serverless application that helps students and professionals improve their resumes using Generative AI.
 
@@ -153,6 +154,16 @@ python scripts/test_upload.py <API_BASE_URL> sample-resumes/resume.pdf
 - XSS-safe rendering of AI output (`textContent`, never `innerHTML`)
 - Responsive layout for mobile
 
+### Day 8: Dashboard polish & hosting
+- Animated SVG ATS score gauge with count-up, color-coded section score bars
+- Drag-and-drop upload zone with file preview, job description character counter
+- Progress steps with spinners and elapsed timer
+- Dark mode (follows system preference, with manual toggle saved locally)
+- "Download report" via print stylesheet (Save as PDF)
+- Accessibility: reduced-motion support, labelled controls, keyboard-friendly upload
+- Hosted on a **private S3 bucket behind CloudFront** using Origin Access Control: HTTPS-only, HTTP→HTTPS redirect, edge caching, compression
+- `scripts/deploy_frontend.py`: one-command deploy with correct content types and CloudFront cache invalidation
+
 
 ## Roadmap
 
@@ -163,7 +174,7 @@ python scripts/test_upload.py <API_BASE_URL> sample-resumes/resume.pdf
 - [x] AI analysis (Bedrock)
 - [x] Results API
 - [x] Dashboard
-- [ ] Security hardening & monitoring
+- [x] Security hardening & monitoring
 
 ### API Reference
 
