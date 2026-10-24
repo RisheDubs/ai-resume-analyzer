@@ -4,9 +4,20 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AI Resume Analyzer</title>
+  <meta name="description" content="Get an ATS score and AI-powered feedback on your resume in under a minute.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>">
   <link rel="stylesheet" href="styles.css">
+  <script>
+    // Apply a saved theme before the page paints, to avoid a flash of the wrong colors
+    try {
+      const saved = localStorage.getItem("theme");
+      if (saved) document.documentElement.dataset.theme = saved;
+    } catch (e) { /* storage unavailable */ }
+  </script>
 </head>
 <body>
+  <button type="button" id="theme-toggle" class="theme-toggle no-print" aria-label="Toggle dark mode">🌓</button>
+
   <main class="container">
 
     <header class="page-header">
@@ -17,9 +28,14 @@
     <!-- 1. Upload form -->
     <section id="upload-section" class="card">
       <form id="upload-form" novalidate>
-        <label for="resume-file">Resume <span class="muted">(PDF, PNG or JPEG, max 5 MB)</span></label>
-        <input type="file" id="resume-file"
-               accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg">
+        <span class="field-label">Resume</span>
+        <label for="resume-file" id="dropzone" class="dropzone">
+          <input type="file" id="resume-file" class="visually-hidden"
+                 accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg">
+          <span class="dropzone-icon" aria-hidden="true">⬆</span>
+          <span id="dropzone-text"><strong>Click to choose</strong> or drag &amp; drop your resume</span>
+          <span class="muted small">PDF, PNG or JPEG · max 5 MB</span>
+        </label>
 
         <label for="target-role">Target role</label>
         <input type="text" id="target-role" maxlength="100" placeholder="e.g. Cloud Engineer">
@@ -27,9 +43,11 @@
         <label for="job-description">Job description <span class="muted">(optional, improves keyword matching)</span></label>
         <textarea id="job-description" rows="6" maxlength="5000"
                   placeholder="Paste the job posting here"></textarea>
+        <p class="muted small char-count"><span id="jd-count">0</span> / 5000</p>
 
-        <button type="submit" id="submit-btn">Analyze resume</button>
+        <button type="submit" id="submit-btn" class="primary">Analyze resume</button>
         <p id="form-error" class="error" role="alert" hidden></p>
+        <p class="muted small privacy">🔒 Your resume is stored privately and deleted automatically after 30 days.</p>
       </form>
     </section>
 
@@ -37,52 +55,70 @@
     <section id="progress-section" class="card" hidden>
       <h2>Analyzing your resume…</h2>
       <ol class="steps" id="steps">
-        <li>Uploading</li>
-        <li>Reading document</li>
-        <li>AI analysis</li>
-        <li>Done</li>
+        <li><span class="step-icon"></span>Uploading</li>
+        <li><span class="step-icon"></span>Reading document</li>
+        <li><span class="step-icon"></span>AI analysis</li>
+        <li><span class="step-icon"></span>Done</li>
       </ol>
-      <p id="progress-text" class="muted"></p>
+      <p class="muted"><span id="progress-text">Starting…</span> · <span id="elapsed">0s</span></p>
     </section>
 
     <!-- 3. Results -->
     <section id="results-section" hidden>
       <div class="card score-card">
-        <div class="score-block">
-          <p class="muted">ATS score<span id="result-role"></span></p>
-          <p class="score"><span id="ats-score">0</span><span class="score-max">/100</span></p>
+        <div class="gauge">
+          <svg viewBox="0 0 120 120" aria-hidden="true">
+            <circle class="gauge-track" cx="60" cy="60" r="52"></circle>
+            <circle class="gauge-fill" id="gauge-fill" cx="60" cy="60" r="52"></circle>
+          </svg>
+          <div class="gauge-label">
+            <span id="ats-score">0</span>
+            <span class="muted small">ATS score</span>
+          </div>
         </div>
-        <div id="section-scores" class="section-scores"></div>
+        <div class="score-details">
+          <h2 id="score-headline"></h2>
+          <p class="muted" id="result-role"></p>
+          <div id="section-scores" class="section-scores"></div>
+        </div>
       </div>
 
       <div class="grid">
         <div class="card">
-          <h3>Strengths</h3>
+          <h3>💪 Strengths</h3>
           <ul id="strengths-list"></ul>
         </div>
         <div class="card">
-          <h3>Missing keywords</h3>
+          <h3>🔍 Missing keywords</h3>
           <div id="keywords-list" class="chips"></div>
         </div>
         <div class="card wide">
-          <h3>Suggested improvements</h3>
+          <h3>🛠️ Suggested improvements</h3>
           <ol id="improvements-list"></ol>
         </div>
         <div class="card">
-          <h3>Recommended skills</h3>
+          <h3>📚 Recommended skills</h3>
           <div id="skills-list" class="chips"></div>
         </div>
         <div class="card">
-          <h3>Professional summary</h3>
+          <h3>✍️ Professional summary</h3>
           <p id="summary-text"></p>
-          <button type="button" id="copy-summary" class="secondary">Copy summary</button>
+          <button type="button" id="copy-summary" class="secondary no-print">Copy summary</button>
         </div>
       </div>
 
-      <button type="button" id="analyze-another" class="secondary">Analyze another resume</button>
+      <div class="actions no-print">
+        <button type="button" id="download-report" class="primary">Download report (PDF)</button>
+        <button type="button" id="analyze-another" class="secondary">Analyze another resume</button>
+      </div>
     </section>
 
   </main>
+
+  <footer class="footer no-print">
+    Built with AWS Lambda, Textract, Bedrock &amp; DynamoDB ·
+    <a href="https://github.com/RisheDubs/ai-resume-analyzer" target="_blank" rel="noopener">View on GitHub</a>
+  </footer>
 
   <script src="config.js"></script>
   <script src="app.js"></script>
