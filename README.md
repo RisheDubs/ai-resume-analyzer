@@ -135,7 +135,7 @@ python scripts/test_upload.py <API_BASE_URL> sample-resumes/resume.pdf
 - Status lifecycle: `PENDING → PROCESSING → TEXT_EXTRACTED → ANALYZING → DONE / FAILED`
 - Added `scripts/show_result.py` to inspect results
 
-###  Day 6: Results API (backend complete)
+### Day 6: Results API (backend complete)
 - Added `GetResult` Lambda behind `GET /results/{resumeId}`
 - Validates UUID format (400) and handles unknown IDs (404)
 - Returns status, `isComplete` flag and analysis; never exposes extracted resume text
@@ -144,13 +144,14 @@ python scripts/test_upload.py <API_BASE_URL> sample-resumes/resume.pdf
 - Least-privilege IAM: `GetItem` only
 - Upgraded `scripts/test_upload.py` to a full end-to-end test with polling and a formatted report
 
-- ## API Reference
-
-| Method | Path | Description |
-|---|---|---|
-| POST | `/upload-url` | Body `{contentType, targetRole?, jobDescription?}` → `{resumeId, uploadUrl, expiresIn}` |
-| GET | `/results/{resumeId}` | → `{status, isComplete, analysis?, error?}` |
-
+### Day 7: Dashboard (functional)
+- Built a framework-free dashboard (HTML, CSS, vanilla JavaScript)
+- Upload form with target role and optional job description
+- Client-side validation (file type and 5 MB size limit)
+- Direct-to-S3 upload via presigned URL, then live progress via polling `GET /results/{id}`
+- Results view: ATS score, section score bars, strengths, missing keywords, improvements, recommended skills, copyable professional summary
+- XSS-safe rendering of AI output (`textContent`, never `innerHTML`)
+- Responsive layout for mobile
 
 
 ## Roadmap
@@ -163,6 +164,21 @@ python scripts/test_upload.py <API_BASE_URL> sample-resumes/resume.pdf
 - [x] Results API
 - [x] Dashboard
 - [ ] Security hardening & monitoring
+
+### API Reference
+
+| Method | Path | Description |
+|---|---|---|
+| POST | `/upload-url` | Body `{contentType, targetRole?, jobDescription?}` → `{resumeId, uploadUrl, expiresIn}` |
+| GET | `/results/{resumeId}` | → `{status, isComplete, analysis?, error?}` |
+
+### Run the dashboard locally
+```bash
+cd frontend
+python -m http.server 8000
+# open http://localhost:8000
+```
+Set your API URL in `frontend/config.js`.
 
 ## Setup & Deployment
 
