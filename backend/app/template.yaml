@@ -135,6 +135,28 @@ Resources:
                 Rules:
                   - Name: prefix
                     Value: uploads/
+                    
+  # ---------- API: fetch status and analysis ----------
+  GetResultFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: get_result/
+      Handler: app.lambda_handler
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref ResultsTable
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action: dynamodb:GetItem
+              Resource: !GetAtt ResultsTable.Arn
+      Events:
+        GetResult:
+          Type: Api
+          Properties:
+            Path: /results/{resumeId}
+            Method: get
+
 
 Outputs:
   UploadUrlEndpoint:
@@ -149,3 +171,6 @@ Outputs:
   ResultsTableName:
     Description: DynamoDB table for analysis results
     Value: !Ref ResultsTable
+  ResultsEndpoint:
+    Description: GET status and analysis for a resume
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/results/{resumeId}"
