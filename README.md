@@ -144,6 +144,15 @@ python scripts/test_upload.py <API_BASE_URL> sample-resumes/resume.pdf
 - Least-privilege IAM: `GetItem` only
 - Upgraded `scripts/test_upload.py` to a full end-to-end test with polling and a formatted report
 
+- ## API Reference
+
+| Method | Path | Description |
+|---|---|---|
+| POST | `/upload-url` | Body `{contentType, targetRole?, jobDescription?}` → `{resumeId, uploadUrl, expiresIn}` |
+| GET | `/results/{resumeId}` | → `{status, isComplete, analysis?, error?}` |
+
+
+
 ## Roadmap
 
 - [x] Project setup
@@ -151,8 +160,8 @@ python scripts/test_upload.py <API_BASE_URL> sample-resumes/resume.pdf
 - [x] Upload API (presigned URLs)
 - [x] Text extraction (Textract)
 - [x] AI analysis (Bedrock)
-- [ ] Results API
-- [ ] Dashboard
+- [x] Results API
+- [x] Dashboard
 - [ ] Security hardening & monitoring
 
 ## Setup & Deployment
