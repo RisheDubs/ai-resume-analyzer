@@ -164,6 +164,31 @@ python scripts/test_upload.py <API_BASE_URL> sample-resumes/resume.pdf
 - Hosted on a **private S3 bucket behind CloudFront** using Origin Access Control: HTTPS-only, HTTP→HTTPS redirect, edge caching, compression
 - `scripts/deploy_frontend.py`: one-command deploy with correct content types and CloudFront cache invalidation
 
+### Day 9: Hardening & monitoring
+- Locked CORS to the CloudFront domain (API Gateway, Lambda responses, S3 bucket)
+- Added API throttling with CORS-enabled gateway error responses
+- Server-side file size validation in the API and the processor
+- CloudWatch metric filters, alarms with SNS email alerts, and a monitoring dashboard
+- 14-day log retention
+- Tested: cross-origin blocking, throttling (429s), oversized and corrupt files, expired upload links, prompt injection
+
+### Security & Reliability
+
+- **CORS locked down:** API Gateway and S3 accept browser requests only from the CloudFront dashboard domain
+- **Rate limiting:** API Gateway throttling (5 req/s, burst 10) protects against abuse and runaway AI costs
+- **Defense in depth:** 5 MB limit and file-type checks enforced in the browser, the API, and the processor (using the real S3 object size)
+- **Least-privilege IAM:** every Lambda has only the exact permissions it needs
+- **Private data:** resume bucket and website bucket are both private; dashboard served via CloudFront Origin Access Control
+- **Short-lived upload links:** presigned URLs expire after 5 minutes
+- **Data retention:** resumes and results auto-delete after 30 days; logs after 14 days
+- **Prompt-injection mitigation:** resume text is treated as untrusted data
+- **XSS-safe frontend:** AI output rendered with `textContent` only
+
+## Monitoring
+
+- **CloudWatch dashboard:** API traffic, 4XX/5XX errors, latency, processing volume, failures and AI analysis time
+- **Metric filters** turn structured JSON logs into custom metrics (`ProcessingFailures`, `AnalysisSeconds`)
+- **Alarms with email alerts (SNS):** processing failures, Lambda crashes or timeouts, API 5XX errors
 
 ## Roadmap
 
