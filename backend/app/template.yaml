@@ -7,6 +7,12 @@ Parameters:
     Type: String
     Default: us.amazon.nova-lite-v1:0
     Description: Bedrock model or inference profile ID used for analysis
+  AlertEmail:
+    Type: String
+    Default: rishekeshris@gmail.com
+    Description: Email address that receives CloudWatch alarm notifications
+    AllowedPattern: "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"
+    ConstraintDescription: AlertEmail must be a valid email address (edit the Default value in template.yaml)
 
 Globals:
   Function:
@@ -15,13 +21,37 @@ Globals:
     MemorySize: 128
     Architectures:
       - x86_64
-  Api:
-    Cors:
-      AllowMethods: "'GET,POST,OPTIONS'"
-      AllowHeaders: "'Content-Type'"
-      AllowOrigin: "'*'"
 
 Resources:
+
+  # ---------- API Gateway: CORS locked to the dashboard + rate limiting ----------
+  ResumeApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub "${AWS::StackName}-api"
+      StageName: Prod
+      Cors:
+        AllowMethods: "'GET,POST,OPTIONS'"
+        AllowHeaders: "'Content-Type'"
+        AllowOrigin: !Sub "'https://${WebsiteDistribution.DomainName}'"
+        MaxAge: "'600'"
+      MethodSettings:
+        - ResourcePath: "/*"
+          HttpMethod: "*"
+          ThrottlingRateLimit: 5      # steady requests per second
+          ThrottlingBurstLimit: 10    # short bursts allowed
+          MetricsEnabled: true
+      GatewayResponses:
+        # Add CORS headers to API Gateway's own errors (e.g. 429 throttling)
+        # so the browser can read them instead of showing a CORS error
+        DEFAULT_4XX:
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Origin: !Sub "'https://${WebsiteDistribution.DomainName}'"
+        DEFAULT_5XX:
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Origin: !Sub "'https://${WebsiteDistribution.DomainName}'"
 
   # ---------- Storage: uploaded resumes ----------
   ResumesBucket:
@@ -39,9 +69,10 @@ Resources:
               SSEAlgorithm: AES256
       CorsConfiguration:
         CorsRules:
-          - AllowedOrigins: ["*"]
-            AllowedMethods: [PUT, GET]
-            AllowedHeaders: ["*"]
+          - AllowedOrigins:
+              - !Sub "https://${WebsiteDistribution.DomainName}"
+            AllowedMethods: [PUT]
+            AllowedHeaders: ["Content-Type"]
             MaxAge: 3000
       LifecycleConfiguration:
         Rules:
@@ -75,6 +106,7 @@ Resources:
         Variables:
           BUCKET_NAME: !Ref ResumesBucket
           TABLE_NAME: !Ref ResultsTable
+          ALLOWED_ORIGIN: !Sub "https://${WebsiteDistribution.DomainName}"
       Policies:
         - Statement:
             - Effect: Allow
@@ -87,6 +119,7 @@ Resources:
         UploadUrl:
           Type: Api
           Properties:
+            RestApiId: !Ref ResumeApi
             Path: /upload-url
             Method: post
 
@@ -145,6 +178,7 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Ref ResultsTable
+          ALLOWED_ORIGIN: !Sub "https://${WebsiteDistribution.DomainName}"
       Policies:
         - Statement:
             - Effect: Allow
@@ -154,6 +188,7 @@ Resources:
         GetResult:
           Type: Api
           Properties:
+            RestApiId: !Ref ResumeApi
             Path: /results/{resumeId}
             Method: get
 
@@ -220,22 +255,165 @@ Resources:
               StringEquals:
                 AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${WebsiteDistribution}"
 
+  # ---------- Monitoring: alerts ----------
+  AlarmTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub "${AWS::StackName}-alarms"
+      Subscription:
+        - Protocol: email
+          Endpoint: !Ref AlertEmail
+
+  # Turn structured log lines into CloudWatch metrics
+  ProcessingFailuresMetricFilter:
+    Type: AWS::Logs::MetricFilter
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${ProcessResumeFunction}"
+      FilterPattern: '{ $.msg = "processing_failed" }'
+      MetricTransformations:
+        - MetricNamespace: ResumeAnalyzer
+          MetricName: ProcessingFailures
+          MetricValue: "1"
+
+  AnalysisCompletedMetricFilter:
+    Type: AWS::Logs::MetricFilter
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${ProcessResumeFunction}"
+      FilterPattern: '{ $.msg = "analysis_complete" }'
+      MetricTransformations:
+        - MetricNamespace: ResumeAnalyzer
+          MetricName: AnalysisSeconds
+          MetricValue: "$.seconds"
+
+  ProcessingFailuresAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${AWS::StackName}-processing-failures"
+      AlarmDescription: One or more resumes failed to process in the last 5 minutes
+      Namespace: ResumeAnalyzer
+      MetricName: ProcessingFailures
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+      AlarmActions: [!Ref AlarmTopic]
+      OKActions: [!Ref AlarmTopic]
+
+  ProcessResumeErrorsAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${AWS::StackName}-process-resume-crashes"
+      AlarmDescription: ProcessResume Lambda crashed or timed out
+      Namespace: AWS/Lambda
+      MetricName: Errors
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref ProcessResumeFunction
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+      AlarmActions: [!Ref AlarmTopic]
+      OKActions: [!Ref AlarmTopic]
+
+  ApiServerErrorsAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${AWS::StackName}-api-5xx"
+      AlarmDescription: API returned 3 or more server errors in 5 minutes
+      Namespace: AWS/ApiGateway
+      MetricName: 5XXError
+      Dimensions:
+        - Name: ApiName
+          Value: !Sub "${AWS::StackName}-api"
+        - Name: Stage
+          Value: Prod
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 3
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+      AlarmActions: [!Ref AlarmTopic]
+      OKActions: [!Ref AlarmTopic]
+
+  # ---------- Monitoring: dashboard ----------
+  MonitoringDashboard:
+    Type: AWS::CloudWatch::Dashboard
+    Properties:
+      DashboardName: !Sub "${AWS::StackName}"
+      DashboardBody: !Sub |
+        {
+          "widgets": [
+            {
+              "type": "metric", "x": 0, "y": 0, "width": 12, "height": 6,
+              "properties": {
+                "title": "API requests and errors",
+                "region": "${AWS::Region}", "stat": "Sum", "period": 300,
+                "metrics": [
+                  ["AWS/ApiGateway", "Count", "ApiName", "${AWS::StackName}-api", "Stage", "Prod"],
+                  [".", "4XXError", ".", ".", ".", "."],
+                  [".", "5XXError", ".", ".", ".", "."]
+                ]
+              }
+            },
+            {
+              "type": "metric", "x": 12, "y": 0, "width": 12, "height": 6,
+              "properties": {
+                "title": "Resume processing",
+                "region": "${AWS::Region}", "stat": "Sum", "period": 300,
+                "metrics": [
+                  ["AWS/Lambda", "Invocations", "FunctionName", "${ProcessResumeFunction}"],
+                  [".", "Errors", ".", "."],
+                  ["ResumeAnalyzer", "ProcessingFailures"]
+                ]
+              }
+            },
+            {
+              "type": "metric", "x": 0, "y": 6, "width": 12, "height": 6,
+              "properties": {
+                "title": "AI analysis time (seconds)",
+                "region": "${AWS::Region}", "period": 300,
+                "metrics": [
+                  ["ResumeAnalyzer", "AnalysisSeconds", { "stat": "Average", "label": "Average" }],
+                  ["...", { "stat": "Maximum", "label": "Maximum" }]
+                ]
+              }
+            },
+            {
+              "type": "metric", "x": 12, "y": 6, "width": 12, "height": 6,
+              "properties": {
+                "title": "API latency (ms)",
+                "region": "${AWS::Region}", "period": 300,
+                "metrics": [
+                  ["AWS/ApiGateway", "Latency", "ApiName", "${AWS::StackName}-api", "Stage", "Prod", { "stat": "Average", "label": "Average" }],
+                  ["...", { "stat": "p90", "label": "p90" }]
+                ]
+              }
+            }
+          ]
+        }
+
 Outputs:
+  ApiBaseUrl:
+    Description: Base URL of the API (put this in frontend/config.js)
+    Value: !Sub "https://${ResumeApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
   UploadUrlEndpoint:
     Description: POST here to get a presigned upload URL
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/upload-url"
-  ApiBaseUrl:
-    Description: Base URL of the API
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+    Value: !Sub "https://${ResumeApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/upload-url"
+  ResultsEndpoint:
+    Description: GET status and analysis for a resume
+    Value: !Sub "https://${ResumeApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/results/{resumeId}"
   ResumesBucketName:
     Description: S3 bucket for uploaded resumes
     Value: !Ref ResumesBucket
   ResultsTableName:
     Description: DynamoDB table for analysis results
     Value: !Ref ResultsTable
-  ResultsEndpoint:
-    Description: GET status and analysis for a resume
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/results/{resumeId}"
   WebsiteUrl:
     Description: Public HTTPS URL of the dashboard
     Value: !Sub "https://${WebsiteDistribution.DomainName}"
@@ -245,3 +423,6 @@ Outputs:
   DistributionId:
     Description: CloudFront distribution ID (for cache invalidation)
     Value: !Ref WebsiteDistribution
+  MonitoringDashboardUrl:
+    Description: CloudWatch dashboard for the app
+    Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/cloudwatch/home?region=${AWS::Region}#dashboards:name=${AWS::StackName}"

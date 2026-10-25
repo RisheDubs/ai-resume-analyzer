@@ -55,7 +55,8 @@ async function requestJson(url, options = {}) {
   const res = await fetch(url, options);
   let body = {};
   try { body = await res.json(); } catch { /* empty or non-JSON body */ }
-  if (!res.ok) throw new Error(body.error || `Request failed (${res.status})`);
+  if (res.status === 429) throw new Error("Too many requests right now. Please wait a moment and try again.");
+  if (!res.ok) throw new Error(body.error || body.message || `Request failed (${res.status})`);
   return body;
 }
 
@@ -149,12 +150,14 @@ function setStep(status) {
 
 // ---------- API flow ----------
 async function uploadResume(file, targetRole, jobDescription) {
+  // 1. Ask our API for a presigned upload URL (JSON request)
   const { resumeId, uploadUrl } = await requestJson(`${API}/upload-url`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ contentType: file.type, targetRole, jobDescription }),
+    body: JSON.stringify({ contentType: file.type, fileSize: file.size, targetRole, jobDescription }),
   });
 
+  // 2. Upload the actual file to S3 (raw file bytes, NOT JSON)
   const put = await fetch(uploadUrl, {
     method: "PUT",
     headers: { "Content-Type": file.type },

@@ -12,6 +12,7 @@ TABLE_NAME = os.environ["TABLE_NAME"]
 POLL_INTERVAL_SECONDS = 2      # how often to check an async Textract job
 MAX_WAIT_SECONDS = 90          # give up on Textract after this
 MAX_TEXT_CHARS = 50000         # keep well under DynamoDB's 400 KB item limit
+MAX_FILE_BYTES = 5 * 1024 * 1024      # 5 MB, same limit as the API and frontend
 
 textract = boto3.client("textract")
 table = boto3.resource("dynamodb").Table(TABLE_NAME)
@@ -65,8 +66,15 @@ def extract_from_pdf(bucket, key):
         job_status = response["JobStatus"]
         if job_status in ("SUCCEEDED", "PARTIAL_SUCCESS"):
             break
-        if job_status == "FAILED":
-            raise RuntimeError(response.get("StatusMessage", "Textract job failed"))
+            if job_status == "FAILED":
+                code = response.get("StatusMessage", "UNKNOWN")
+                friendly = {
+                    "INVALID_IMAGE_TYPE": "This file couldn't be read. Please upload a standard, "
+                                        "non-password-protected PDF, PNG or JPEG.",
+                    "UNSUPPORTED_DOCUMENT": "This document format isn't supported. Try saving it again as PDF.",
+                }.get(code, "We couldn't read this document. Please try a different file.")
+                log("textract_job_failed", jobId=job_id, code=code)
+                raise RuntimeError(friendly)
         if time.time() > deadline:
             raise TimeoutError("Textract took too long to process the document")
         time.sleep(POLL_INTERVAL_SECONDS)
@@ -103,6 +111,11 @@ def lambda_handler(event, context):
 
         log("processing_started", resumeId=resume_id, key=key)
         set_status(resume_id, "PROCESSING")
+        file_size = record["s3"]["object"].get("size", 0)
+        if file_size > MAX_FILE_BYTES:
+            log("processing_failed", resumeId=resume_id, error="File too large", bytes=file_size)
+            set_status(resume_id, "FAILED", errorMessage="File is too large. Maximum size is 5 MB.")
+            continue
 
         try:
             # 1. Extract text

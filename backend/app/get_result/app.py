@@ -6,6 +6,7 @@ from decimal import Decimal
 import boto3
 
 TABLE_NAME = os.environ["TABLE_NAME"]
+ALLOWED_ORIGIN = os.environ.get("ALLOWED_ORIGIN", "*")
 table = boto3.resource("dynamodb").Table(TABLE_NAME)
 
 UUID_PATTERN = re.compile(
@@ -26,7 +27,7 @@ def response(status_code, body):
         "statusCode": status_code,
         "headers": {
             "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
             "Cache-Control": "no-store",   # results change while processing
         },
         "body": json.dumps(body, default=decimal_to_number),
