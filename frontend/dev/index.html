@@ -1,0 +1,925 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Developer · Interview Prep</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+  <script>
+    try {
+      const saved = localStorage.getItem("theme");
+      if (saved) document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style>
+    /* ---------- Theme (same tokens as the main dashboard) ---------- */
+    :root {
+      color-scheme: light;
+      --bg: #f5f7fb; --card: #ffffff; --text: #1f2937; --muted: #6b7280;
+      --border: #e5e7eb; --input-bg: #ffffff; --track: #e5e7eb;
+      --primary: #4f46e5; --primary-hover: #4338ca; --primary-soft: #eef2ff; --on-primary: #ffffff;
+      --good: #16a34a; --good-soft: #dcfce7; --ok: #d97706; --ok-soft: #fef3c7;
+      --bad: #dc2626; --bad-soft: #fee2e2;
+      --cloud: #0284c7; --cloud-soft: #e0f2fe; --dev: #7c3aed; --dev-soft: #ede9fe;
+      --radius: 14px;
+      --shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 6px 24px rgba(0, 0, 0, 0.04);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --bg: #0f172a; --card: #1e293b; --text: #e2e8f0; --muted: #94a3b8;
+        --border: #334155; --input-bg: #0f172a; --track: #334155;
+        --primary: #818cf8; --primary-hover: #a5b4fc; --primary-soft: #312e81; --on-primary: #0f172a;
+        --good: #4ade80; --good-soft: #14532d; --ok: #fbbf24; --ok-soft: #451a03;
+        --bad: #f87171; --bad-soft: #450a0a;
+        --cloud: #38bdf8; --cloud-soft: #0c4a6e; --dev: #c4b5fd; --dev-soft: #3b0764;
+        --shadow: none;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #0f172a; --card: #1e293b; --text: #e2e8f0; --muted: #94a3b8;
+      --border: #334155; --input-bg: #0f172a; --track: #334155;
+      --primary: #818cf8; --primary-hover: #a5b4fc; --primary-soft: #312e81; --on-primary: #0f172a;
+      --good: #4ade80; --good-soft: #14532d; --ok: #fbbf24; --ok-soft: #451a03;
+      --bad: #f87171; --bad-soft: #450a0a;
+      --cloud: #38bdf8; --cloud-soft: #0c4a6e; --dev: #c4b5fd; --dev-soft: #3b0764;
+      --shadow: none;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; line-height: 1.55;
+    }
+    a { color: var(--primary); }
+    .container { max-width: 980px; margin: 0 auto; padding: 24px 16px 48px; }
+    .muted { color: var(--muted); }
+    .small { font-size: 0.85rem; }
+    code {
+      font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: 0.88em;
+      background: var(--primary-soft); color: var(--primary); padding: 1px 6px; border-radius: 6px;
+    }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+
+    /* ---------- Top bar ---------- */
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+    .topbar a { text-decoration: none; font-weight: 600; font-size: 0.92rem; }
+    .topbar-right { display: flex; align-items: center; gap: 8px; }
+    .icon-btn {
+      width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border);
+      background: var(--card); font-size: 1.1rem; cursor: pointer;
+    }
+    .icon-btn:hover { background: var(--primary-soft); }
+
+    .page-header { text-align: center; margin-bottom: 24px; }
+    .eyebrow {
+      display: inline-block; margin-bottom: 10px; padding: 4px 12px; border-radius: 999px;
+      background: var(--primary-soft); color: var(--primary); font-size: 0.8rem; font-weight: 600;
+    }
+    .page-header h1 { margin: 0 0 6px; font-size: clamp(1.7rem, 4vw, 2.3rem); letter-spacing: -0.02em; }
+    .page-header p { margin: 0; color: var(--muted); }
+
+    /* ---------- Buttons & inputs ---------- */
+    button { font: inherit; cursor: pointer; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; border-radius: 10px;
+      font-weight: 600; font-size: 0.92rem; border: 1px solid var(--primary);
+      background: transparent; color: var(--primary); transition: background 0.15s;
+    }
+    .btn:hover { background: var(--primary-soft); }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn.primary { background: var(--primary); color: var(--on-primary); }
+    .btn.primary:hover { background: var(--primary-hover); }
+    .btn.ghost { border-color: var(--border); color: var(--text); }
+    .btn.ghost:hover { background: var(--bg); }
+    .btn.danger { border-color: var(--bad); color: var(--bad); }
+    .btn.danger:hover { background: var(--bad-soft); }
+    input[type="text"], input[type="email"], input[type="password"], input[type="search"], select, textarea {
+      width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 10px;
+      background: var(--input-bg); color: var(--text); font: inherit;
+    }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+    textarea { resize: vertical; }
+    .error { color: var(--bad); font-size: 0.9rem; margin: 12px 0 0; }
+
+    /* ---------- Login ---------- */
+    .login { max-width: 420px; margin: 40px auto; padding: 28px; }
+    .login h2 { margin: 0 0 4px; }
+    .login label { display: block; font-weight: 600; font-size: 0.9rem; margin: 16px 0 6px; }
+    .login .btn { width: 100%; justify-content: center; margin-top: 20px; padding: 11px; }
+
+    /* ---------- Tabs ---------- */
+    .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 6px; margin-bottom: 16px; }
+    .tab {
+      display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 12px 8px;
+      border: none; border-radius: 10px; background: transparent; color: var(--muted); font-weight: 600;
+    }
+    .tab .count { font-size: 0.78rem; font-weight: 500; }
+    .tab:hover { background: var(--bg); }
+    .tab[aria-selected="true"] { background: var(--primary-soft); color: var(--primary); }
+    .tab[data-tab="cloud"][aria-selected="true"] { background: var(--cloud-soft); color: var(--cloud); }
+    .tab[data-tab="dev"][aria-selected="true"] { background: var(--dev-soft); color: var(--dev); }
+
+    /* ---------- Toolbar ---------- */
+    .toolbar { padding: 16px; margin-bottom: 16px; }
+    .filters { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; }
+    .toggles { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; align-items: center; }
+    .toggles label { display: inline-flex; align-items: center; gap: 6px; font-size: 0.9rem; cursor: pointer; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .actions .spacer { flex: 1; }
+    .progress-wrap { margin-top: 14px; }
+    .progress-label { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; }
+    .progress { height: 8px; border-radius: 999px; background: var(--track); overflow: hidden; }
+    .progress-fill { height: 100%; width: 0; background: var(--good); border-radius: 999px; transition: width 0.4s ease-out; }
+    .save-status { font-size: 0.82rem; color: var(--muted); }
+    .save-status.saving { color: var(--ok); }
+    .save-status.saved { color: var(--good); }
+    .save-status.failed { color: var(--bad); }
+
+    /* ---------- Question cards ---------- */
+    .list { display: flex; flex-direction: column; gap: 10px; }
+    .q-card { overflow: hidden; transition: box-shadow 0.2s, border-color 0.2s; }
+    .q-card.flash { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-soft); }
+    .q-card.is-practiced .q-title { color: var(--muted); }
+    .q-head { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; }
+    .q-toggle { flex: 1; display: flex; align-items: flex-start; gap: 12px; text-align: left; border: none; background: transparent; color: inherit; padding: 0; }
+    .q-num { flex-shrink: 0; min-width: 56px; padding: 4px 8px; border-radius: 8px; font-size: 0.78rem; font-weight: 700; text-align: center; }
+    .q-num.cloud { background: var(--cloud-soft); color: var(--cloud); }
+    .q-num.dev { background: var(--dev-soft); color: var(--dev); }
+    .q-main { flex: 1; min-width: 0; }
+    .q-title { margin: 0 0 6px; font-size: 1.02rem; font-weight: 600; line-height: 1.4; }
+    .q-meta { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chev { flex-shrink: 0; color: var(--muted); transition: transform 0.2s; margin-top: 2px; }
+    .q-card.open .chev { transform: rotate(180deg); }
+    .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 999px; font-size: 0.76rem; font-weight: 600; }
+    .chip.cat { background: var(--primary-soft); color: var(--primary); }
+    .chip.Easy { background: var(--good-soft); color: var(--good); }
+    .chip.Medium { background: var(--ok-soft); color: var(--ok); }
+    .chip.Hard { background: var(--bad-soft); color: var(--bad); }
+    .chip.cloud { background: var(--cloud-soft); color: var(--cloud); }
+    .chip.dev { background: var(--dev-soft); color: var(--dev); }
+    .chip.similar { background: transparent; border: 1px dashed var(--primary); color: var(--primary); }
+    .chip.custom { background: var(--bg); color: var(--muted); border: 1px solid var(--border); }
+    .practiced-toggle { flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--muted); cursor: pointer; margin-top: 3px; }
+    .practiced-toggle input { width: 16px; height: 16px; accent-color: var(--good); cursor: pointer; }
+    .q-body { padding: 0 16px 18px 84px; }
+    .q-body h4 { margin: 4px 0 8px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+    .q-body ul { margin: 0 0 14px; padding-left: 20px; }
+    .q-body li { margin-bottom: 6px; }
+    .callout { padding: 12px 14px; border-radius: 10px; margin-bottom: 10px; font-size: 0.93rem; }
+    .callout strong { display: block; margin-bottom: 2px; font-size: 0.82rem; }
+    .callout p { margin: 0; }
+    .callout.project { background: var(--primary-soft); }
+    .callout.project strong { color: var(--primary); }
+    .callout.tip { background: var(--ok-soft); }
+    .callout.tip strong { color: var(--ok); }
+    .callout.similar-box { border: 1px dashed var(--primary); display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+    .notes-label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--muted); margin: 14px 0 6px; }
+    .body-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
+    .empty { padding: 40px 16px; text-align: center; color: var(--muted); }
+
+    /* ---------- Dialogs ---------- */
+    dialog {
+      width: min(640px, calc(100vw - 32px)); max-height: calc(100vh - 48px); padding: 0;
+      border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); color: var(--text);
+    }
+    dialog::backdrop { background: rgba(15, 23, 42, 0.55); }
+    .dialog-inner { padding: 22px; }
+    .dialog-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .dialog-head h2 { margin: 0; font-size: 1.2rem; }
+    .close-x { border: none; background: transparent; color: var(--muted); font-size: 1.4rem; line-height: 1; padding: 4px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-grid .full { grid-column: 1 / -1; }
+    .form-grid label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; }
+    .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
+    .practice-q { font-size: 1.25rem; font-weight: 700; line-height: 1.4; margin: 10px 0 16px; }
+    .practice-answer { border-top: 1px solid var(--border); padding-top: 14px; margin-top: 6px; }
+    .practice-answer ul { padding-left: 20px; margin: 0 0 12px; }
+    .practice-answer li { margin-bottom: 6px; }
+
+    @media (max-width: 680px) {
+      .filters { grid-template-columns: 1fr 1fr; }
+      .filters .search { grid-column: 1 / -1; }
+      .q-body { padding-left: 16px; }
+      .q-head { flex-wrap: wrap; }
+      .practiced-toggle { margin-left: 68px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .actions .spacer { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <div class="topbar">
+      <a href="../index.html">← Back to AI Resume Analyzer</a>
+      <div class="topbar-right">
+        <button type="button" class="btn ghost" id="signout-btn" hidden>Sign out</button>
+        <button type="button" class="icon-btn" id="theme-toggle" aria-label="Toggle dark mode">🌓</button>
+      </div>
+    </div>
+
+    <header class="page-header">
+      <span class="eyebrow">🔒 Developer only</span>
+      <h1>Interview Prep</h1>
+      <p>Questions about this project for Cloud Engineer and Software Developer roles. Your answers are saved to AWS.</p>
+    </header>
+
+    <!-- Sign in -->
+    <section id="login-view" class="card login" hidden>
+      <h2>Sign in</h2>
+      <p class="muted small" id="login-message">This page is only for the project's developer.</p>
+      <form id="login-form" novalidate>
+        <label for="login-email">Email</label>
+        <input type="email" id="login-email" autocomplete="username" required>
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" autocomplete="current-password" required>
+        <button type="submit" class="btn primary" id="login-btn">Sign in</button>
+        <p class="error" id="login-error" role="alert" hidden></p>
+      </form>
+    </section>
+
+    <!-- App -->
+    <section id="app-view" hidden>
+      <nav class="tabs card" role="tablist" aria-label="Role">
+        <button class="tab" role="tab" data-tab="cloud" aria-selected="true">☁️ Cloud Engineer <span class="count" id="count-cloud"></span></button>
+        <button class="tab" role="tab" data-tab="dev" aria-selected="false">💻 Software Developer <span class="count" id="count-dev"></span></button>
+        <button class="tab" role="tab" data-tab="all" aria-selected="false">📚 All questions <span class="count" id="count-all"></span></button>
+      </nav>
+
+      <section class="toolbar card" aria-label="Filters and actions">
+        <div class="filters">
+          <input type="search" class="search" id="search" placeholder="Search questions and answers… (press / to focus)" aria-label="Search">
+          <select id="category" aria-label="Category"><option value="">All categories</option></select>
+          <select id="difficulty" aria-label="Difficulty">
+            <option value="">All difficulties</option><option>Easy</option><option>Medium</option><option>Hard</option>
+          </select>
+        </div>
+        <div class="toggles">
+          <label><input type="checkbox" id="shared-only"> ↔ Only questions similar across both roles</label>
+          <label><input type="checkbox" id="hide-practiced"> Hide practiced</label>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn primary" id="practice-btn">🎯 Practice mode</button>
+          <button type="button" class="btn" id="add-btn">＋ Add question</button>
+          <button type="button" class="btn ghost" id="backup-btn">⇩ Download backup</button>
+          <span class="spacer"></span>
+          <button type="button" class="btn ghost" id="expand-btn">Expand all</button>
+          <button type="button" class="btn ghost" id="collapse-btn">Collapse all</button>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-label">
+            <span id="progress-text">0 of 0 practiced</span>
+            <span><span class="save-status" id="save-status"></span> · <span id="progress-pct">0%</span></span>
+          </div>
+          <div class="progress"><div class="progress-fill" id="progress-fill"></div></div>
+        </div>
+      </section>
+
+      <section class="list" id="list" aria-live="polite"></section>
+    </section>
+  </main>
+
+  <!-- Practice mode -->
+  <dialog id="practice-dialog" aria-labelledby="practice-title">
+    <div class="dialog-inner">
+      <div class="dialog-head">
+        <h2 id="practice-title">🎯 Practice mode</h2>
+        <button type="button" class="close-x" data-close aria-label="Close">×</button>
+      </div>
+      <div class="q-meta" id="practice-meta"></div>
+      <p class="practice-q" id="practice-question"></p>
+      <p class="muted small" id="practice-hint">Answer out loud first, then reveal the guide.</p>
+      <div class="practice-answer" id="practice-answer" hidden></div>
+      <div class="dialog-actions">
+        <button type="button" class="btn ghost" id="practice-done">✓ Mark practiced</button>
+        <button type="button" class="btn" id="practice-reveal">Reveal answer</button>
+        <button type="button" class="btn primary" id="practice-next">Next question →</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Add / edit question -->
+  <dialog id="edit-dialog" aria-labelledby="edit-title">
+    <form class="dialog-inner" id="edit-form" novalidate>
+      <div class="dialog-head">
+        <h2 id="edit-title">＋ Add a question</h2>
+        <button type="button" class="close-x" data-close aria-label="Close">×</button>
+      </div>
+      <div class="form-grid">
+        <div>
+          <label for="f-role">Role</label>
+          <select id="f-role"><option value="cloud">Cloud Engineer</option><option value="dev">Software Developer</option></select>
+        </div>
+        <div>
+          <label for="f-difficulty">Difficulty</label>
+          <select id="f-difficulty"><option>Easy</option><option selected>Medium</option><option>Hard</option></select>
+        </div>
+        <div class="full">
+          <label for="f-category">Category</label>
+          <input type="text" id="f-category" list="category-list" placeholder="e.g. Security" maxlength="40">
+          <datalist id="category-list"></datalist>
+        </div>
+        <div class="full">
+          <label for="f-question">Question</label>
+          <input type="text" id="f-question" maxlength="300">
+        </div>
+        <div class="full">
+          <label for="f-points">Key points to cover <span class="muted">(one per line; wrap code in `backticks`)</span></label>
+          <textarea id="f-points" rows="6"></textarea>
+        </div>
+        <div class="full">
+          <label for="f-project">In your project <span class="muted">(optional)</span></label>
+          <textarea id="f-project" rows="2" maxlength="600"></textarea>
+        </div>
+        <div class="full">
+          <label for="f-tip">Tip <span class="muted">(optional)</span></label>
+          <input type="text" id="f-tip" maxlength="400">
+        </div>
+        <div class="full">
+          <label for="f-similar">Similar question in the other role <span class="muted">(optional)</span></label>
+          <select id="f-similar"><option value="">None</option></select>
+        </div>
+      </div>
+      <p class="error" id="edit-error" role="alert" hidden></p>
+      <div class="dialog-actions">
+        <button type="button" class="btn ghost" data-close>Cancel</button>
+        <button type="submit" class="btn primary" id="edit-save">Save question</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="../config.js"></script>
+  <script>
+    // ---------- Settings ----------
+    const CONFIG = window.APP_CONFIG || {};
+    const API = (CONFIG.API_BASE_URL || "").replace(/\/$/, "");
+    const COGNITO_REGION = CONFIG.COGNITO_REGION || "us-east-1";
+    const COGNITO_CLIENT_ID = CONFIG.COGNITO_CLIENT_ID || "";
+    const TOKEN_KEY = "devPortal.idToken";
+    const NOTES_SAVE_DELAY_MS = 800;
+    const ROLES = { cloud: { name: "Cloud Engineer", short: "CE", prefix: "ce" }, dev: { name: "Software Developer", short: "SD", prefix: "se" } };
+    const REDUCED_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // ---------- Helpers ----------
+    const $ = (id) => document.getElementById(id);
+
+    function el(tag, props = {}, ...children) {
+      const node = document.createElement(tag);
+      for (const [key, value] of Object.entries(props)) {
+        if (value == null || value === false) continue;
+        if (key === "class") node.className = value;
+        else if (key === "text") node.textContent = value;
+        else if (key.startsWith("on")) node.addEventListener(key.slice(2), value);
+        else node.setAttribute(key, value === true ? "" : value);
+      }
+      for (const child of children.flat()) if (child != null && child !== false) node.append(child);
+      return node;
+    }
+
+    // `backtick` segments become <code>; everything is inserted as text, never HTML
+    function rich(text) {
+      const fragment = document.createDocumentFragment();
+      String(text || "").split("`").forEach((part, i) => {
+        fragment.append(i % 2 ? el("code", { text: part }) : document.createTextNode(part));
+      });
+      return fragment;
+    }
+
+    function storage(kind, key, value) {
+      try {
+        const s = kind === "session" ? sessionStorage : localStorage;
+        if (value === undefined) return s.getItem(key);
+        if (value === null) s.removeItem(key); else s.setItem(key, value);
+      } catch { return null; }
+    }
+
+    // ---------- Sign in with Amazon Cognito ----------
+    async function signIn(email, password) {
+      const res = await fetch(`https://cognito-idp.${COGNITO_REGION}.amazonaws.com/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-amz-json-1.1",
+          "X-Amz-Target": "AWSCognitoIdentityProviderService.InitiateAuth",
+        },
+        body: JSON.stringify({
+          AuthFlow: "USER_PASSWORD_AUTH",
+          ClientId: COGNITO_CLIENT_ID,
+          AuthParameters: { USERNAME: email, PASSWORD: password },
+        }),
+      });
+      let body = {};
+      try { body = await res.json(); } catch { /* no body */ }
+      if (!res.ok) {
+        const type = String(body.__type || "");
+        if (type.includes("NotAuthorized") || type.includes("UserNotFound")) throw new Error("Incorrect email or password.");
+        if (type.includes("TooManyRequests")) throw new Error("Too many attempts. Wait a minute and try again.");
+        throw new Error(body.message || `Sign-in failed (${res.status}).`);
+      }
+      if (body.ChallengeName === "NEW_PASSWORD_REQUIRED") {
+        throw new Error("This account still has a temporary password. Run the 'admin-set-user-password' command from DEVELOPER.md, then sign in.");
+      }
+      if (body.ChallengeName) throw new Error(`Unsupported sign-in step: ${body.ChallengeName}`);
+      storage("session", TOKEN_KEY, body.AuthenticationResult.IdToken);
+    }
+
+    function signOut(message) {
+      storage("session", TOKEN_KEY, null);
+      questions = [];
+      showLogin(message);
+    }
+
+    // ---------- API ----------
+    class AuthError extends Error {}
+
+    async function api(method, path, body) {
+      const res = await fetch(API + path, {
+        method,
+        headers: { "Content-Type": "application/json", Authorization: storage("session", TOKEN_KEY) || "" },
+        body: body === undefined ? undefined : JSON.stringify(body),
+      });
+      if (res.status === 401 || res.status === 403) {
+        signOut("Your session has expired. Please sign in again.");
+        throw new AuthError("Signed out");
+      }
+      let data = {};
+      try { data = await res.json(); } catch { /* no body */ }
+      if (res.status === 429) throw new Error("Too many requests. Wait a moment and try again.");
+      if (!res.ok) throw new Error(data.error || data.message || `Request failed (${res.status})`);
+      return data;
+    }
+
+    // ---------- Save status ----------
+    let pendingSaves = 0;
+    function setSaveStatus(kind, message) {
+      const status = $("save-status");
+      status.className = `save-status ${kind}`;
+      status.textContent = message;
+    }
+    async function trackSave(promise) {
+      pendingSaves += 1;
+      setSaveStatus("saving", "Saving…");
+      try {
+        const result = await promise;
+        pendingSaves -= 1;
+        if (!pendingSaves) setSaveStatus("saved", "All changes saved to AWS ✓");
+        return result;
+      } catch (error) {
+        pendingSaves -= 1;
+        if (!(error instanceof AuthError)) setSaveStatus("failed", `Not saved: ${error.message}`);
+        throw error;
+      }
+    }
+    window.addEventListener("beforeunload", (event) => {
+      if (pendingSaves || notesTimers.size) { event.preventDefault(); event.returnValue = ""; }
+    });
+
+    // ---------- Data ----------
+    let questions = [];
+
+    function normalize(q) {
+      return { ...q, id: q.questionId || q.id, points: q.points || [], practiced: Boolean(q.practiced), notes: q.notes || "" };
+    }
+
+    function sortQuestions() {
+      const roleOrder = { cloud: 0, dev: 1 };
+      questions.sort((a, b) => (roleOrder[a.role] - roleOrder[b.role]) || ((a.order || 0) - (b.order || 0)) || a.question.localeCompare(b.question));
+    }
+
+    const findQuestion = (id) => questions.find((q) => q.id === id);
+
+    function similarMap() {
+      const map = {};
+      for (const q of questions) {
+        if (q.similar && findQuestion(q.similar)) {
+          map[q.id] = q.similar;
+          if (!map[q.similar]) map[q.similar] = q.id;
+        }
+      }
+      return map;
+    }
+
+    function displayNumber(q) {
+      const sameRole = questions.filter((x) => x.role === q.role);
+      return `${ROLES[q.role].short} ${String(sameRole.indexOf(q) + 1).padStart(2, "0")}`;
+    }
+
+    async function loadQuestions() {
+      $("list").replaceChildren(el("div", { class: "empty card", text: "Loading your questions from AWS…" }));
+      const data = await api("GET", "/prep/questions");
+      questions = (data.questions || []).map(normalize);
+      sortQuestions();
+      storage("local", "devLink", "1");   // show the footer link on the main app in this browser
+      renderCategoryOptions();
+      render();
+      setSaveStatus("saved", "Loaded from AWS ✓");
+    }
+
+    // ---------- Views ----------
+    function showLogin(message) {
+      $("app-view").hidden = true;
+      $("signout-btn").hidden = true;
+      $("login-view").hidden = false;
+      $("login-message").textContent = message || "This page is only for the project's developer.";
+      $("login-password").value = "";
+      $("login-email").focus();
+    }
+
+    async function showApp() {
+      $("login-view").hidden = true;
+      $("app-view").hidden = false;
+      $("signout-btn").hidden = false;
+      try {
+        await loadQuestions();
+      } catch (error) {
+        if (!(error instanceof AuthError)) {
+          $("list").replaceChildren(el("div", { class: "empty card", text: `Couldn't load questions: ${error.message}` }));
+        }
+      }
+    }
+
+    // ---------- Filters ----------
+    const state = { tab: "cloud", search: "", category: "", difficulty: "", sharedOnly: false, hidePracticed: false, open: new Set() };
+
+    function filteredQuestions() {
+      const sims = similarMap();
+      const term = state.search.trim().toLowerCase();
+      return questions.filter((q) => {
+        if (state.tab !== "all" && q.role !== state.tab) return false;
+        if (state.category && q.category !== state.category) return false;
+        if (state.difficulty && q.difficulty !== state.difficulty) return false;
+        if (state.sharedOnly && !sims[q.id]) return false;
+        if (state.hidePracticed && q.practiced) return false;
+        if (term) {
+          const haystack = [q.question, q.category, q.project, q.tip, q.notes, ...q.points].join(" ").toLowerCase();
+          if (!haystack.includes(term)) return false;
+        }
+        return true;
+      });
+    }
+
+    // ---------- Rendering ----------
+    function renderCategoryOptions() {
+      const categories = [...new Set(questions.map((q) => q.category))].sort();
+      const select = $("category");
+      const current = select.value;
+      select.replaceChildren(el("option", { value: "", text: "All categories" }), ...categories.map((c) => el("option", { value: c, text: c })));
+      select.value = categories.includes(current) ? current : "";
+      $("category-list").replaceChildren(...categories.map((c) => el("option", { value: c })));
+    }
+
+    function renderCounts() {
+      $("count-cloud").textContent = `${questions.filter((q) => q.role === "cloud").length} questions`;
+      $("count-dev").textContent = `${questions.filter((q) => q.role === "dev").length} questions`;
+      $("count-all").textContent = `${questions.length} questions`;
+    }
+
+    function renderProgress() {
+      const scope = questions.filter((q) => state.tab === "all" || q.role === state.tab);
+      const done = scope.filter((q) => q.practiced).length;
+      const pct = scope.length ? Math.round((done / scope.length) * 100) : 0;
+      $("progress-text").textContent = `${done} of ${scope.length} practiced`;
+      $("progress-pct").textContent = `${pct}%`;
+      $("progress-fill").style.width = `${pct}%`;
+    }
+
+    const notesTimers = new Map();
+
+    function saveNotes(q, value) {
+      clearTimeout(notesTimers.get(q.id));
+      notesTimers.delete(q.id);
+      q.notes = value;
+      trackSave(api("PATCH", `/prep/questions/${q.id}`, { notes: value })).catch(() => {});
+    }
+
+    function buildCard(q, sims) {
+      const isOpen = state.open.has(q.id);
+      const similarQ = sims[q.id] ? findQuestion(sims[q.id]) : null;
+
+      const meta = el("div", { class: "q-meta" },
+        state.tab === "all" ? el("span", { class: `chip ${q.role}`, text: ROLES[q.role].name }) : null,
+        el("span", { class: "chip cat", text: q.category }),
+        el("span", { class: `chip ${q.difficulty}`, text: q.difficulty }),
+        similarQ ? el("span", { class: "chip similar", text: `↔ Similar: ${displayNumber(similarQ)}` }) : null,
+        q.custom ? el("span", { class: "chip custom", text: "Your question" }) : null,
+        q.notes ? el("span", { class: "chip custom", text: "📝 Notes" }) : null,
+      );
+
+      const checkbox = el("input", { type: "checkbox", "aria-label": "Mark as practiced" });
+      checkbox.checked = q.practiced;
+      checkbox.addEventListener("change", async () => {
+        const value = checkbox.checked;
+        q.practiced = value;
+        card.classList.toggle("is-practiced", value);
+        renderProgress();
+        try {
+          await trackSave(api("PATCH", `/prep/questions/${q.id}`, { practiced: value }));
+          if (state.hidePracticed && value) render();
+        } catch {
+          q.practiced = !value;
+          checkbox.checked = !value;
+          card.classList.toggle("is-practiced", !value);
+          renderProgress();
+        }
+      });
+
+      const toggle = el("button", { type: "button", class: "q-toggle", "aria-expanded": String(isOpen), "aria-controls": `body-${q.id}` },
+        el("span", { class: `q-num ${q.role}`, text: displayNumber(q) }),
+        el("div", { class: "q-main" }, el("p", { class: "q-title", text: q.question }), meta),
+        el("span", { class: "chev", "aria-hidden": "true", text: "▾" }),
+      );
+
+      const notes = el("textarea", { rows: "3", id: `notes-${q.id}`, maxlength: "5000", placeholder: "Your own answer, examples or reminders… (saved to AWS automatically)" });
+      notes.value = q.notes;
+      notes.addEventListener("input", () => {
+        clearTimeout(notesTimers.get(q.id));
+        setSaveStatus("saving", "Unsaved changes…");
+        notesTimers.set(q.id, setTimeout(() => saveNotes(q, notes.value), NOTES_SAVE_DELAY_MS));
+      });
+      notes.addEventListener("blur", () => {
+        if (notesTimers.has(q.id)) saveNotes(q, notes.value);
+      });
+
+      const body = el("div", { class: "q-body", id: `body-${q.id}`, hidden: !isOpen },
+        el("h4", { text: "Key points to cover" }),
+        el("ul", {}, q.points.map((p) => el("li", {}, rich(p)))),
+        q.project ? el("div", { class: "callout project" }, el("strong", { text: "📌 In your project" }), el("p", {}, rich(q.project))) : null,
+        q.tip ? el("div", { class: "callout tip" }, el("strong", { text: "💡 Tip" }), el("p", {}, rich(q.tip))) : null,
+        similarQ ? el("div", { class: "callout similar-box" },
+          el("div", {},
+            el("strong", { text: `↔ Similar question for ${ROLES[similarQ.role].name} (${displayNumber(similarQ)})` }),
+            el("p", { text: similarQ.question })),
+          el("button", { type: "button", class: "btn", text: "Go to it →", onclick: () => goToQuestion(similarQ.id) }),
+        ) : null,
+        el("label", { class: "notes-label", for: `notes-${q.id}`, text: "📝 Your answer / notes" }),
+        notes,
+        el("div", { class: "body-actions" },
+          el("button", { type: "button", class: "btn ghost", text: "✎ Edit question", onclick: () => openEditor(q) }),
+          el("button", { type: "button", class: "btn danger", text: "Delete", onclick: () => deleteQuestion(q) }),
+        ),
+      );
+
+      toggle.addEventListener("click", () => {
+        const nowOpen = body.hidden;
+        body.hidden = !nowOpen;
+        toggle.setAttribute("aria-expanded", String(nowOpen));
+        card.classList.toggle("open", nowOpen);
+        if (nowOpen) state.open.add(q.id); else state.open.delete(q.id);
+      });
+
+      const card = el("article", { class: `q-card card${isOpen ? " open" : ""}${q.practiced ? " is-practiced" : ""}`, id: `q-${q.id}` },
+        el("div", { class: "q-head" }, toggle, el("label", { class: "practiced-toggle" }, checkbox, "Practiced")),
+        body,
+      );
+      return card;
+    }
+
+    function render() {
+      document.querySelectorAll(".tab").forEach((t) => t.setAttribute("aria-selected", String(t.dataset.tab === state.tab)));
+      renderCounts();
+      renderProgress();
+      const sims = similarMap();
+      const items = filteredQuestions();
+      $("list").replaceChildren(...(items.length
+        ? items.map((q) => buildCard(q, sims))
+        : [el("div", { class: "empty card", text: questions.length ? "No questions match these filters." : "No questions yet. Run scripts/seed_prep.py or add one." })]));
+    }
+
+    function goToQuestion(id) {
+      const q = findQuestion(id);
+      if (!q) return;
+      if (state.tab !== "all") state.tab = q.role;
+      Object.assign(state, { search: "", category: "", difficulty: "", hidePracticed: false });
+      if (!similarMap()[id]) { state.sharedOnly = false; $("shared-only").checked = false; }
+      $("search").value = ""; $("category").value = ""; $("difficulty").value = "";
+      $("hide-practiced").checked = false;
+      state.open.add(id);
+      render();
+      const card = $(`q-${id}`);
+      if (!card) return;
+      card.scrollIntoView({ behavior: REDUCED_MOTION ? "auto" : "smooth", block: "center" });
+      card.classList.add("flash");
+      setTimeout(() => card.classList.remove("flash"), 1600);
+    }
+
+    // ---------- Add / edit / delete ----------
+    let editingId = null;
+
+    function fillSimilarOptions(selected) {
+      const role = $("f-role").value;
+      const others = questions.filter((q) => q.role !== role);
+      $("f-similar").replaceChildren(el("option", { value: "", text: "None" }),
+        ...others.map((q) => el("option", { value: q.id, text: `${displayNumber(q)} · ${q.question}` })));
+      $("f-similar").value = others.some((q) => q.id === selected) ? selected : "";
+    }
+
+    function openEditor(q) {
+      editingId = q ? q.id : null;
+      $("edit-form").reset();
+      $("edit-title").textContent = q ? "✎ Edit question" : "＋ Add a question";
+      $("f-role").value = q ? q.role : (state.tab === "dev" ? "dev" : "cloud");
+      $("f-difficulty").value = q ? q.difficulty : "Medium";
+      $("f-category").value = q ? q.category : "";
+      $("f-question").value = q ? q.question : "";
+      $("f-points").value = q ? q.points.join("\n") : "";
+      $("f-project").value = q ? q.project || "" : "";
+      $("f-tip").value = q ? q.tip || "" : "";
+      fillSimilarOptions(q ? q.similar : "");
+      $("edit-error").hidden = true;
+      $("edit-dialog").showModal();
+      $("f-question").focus();
+    }
+
+    $("add-btn").addEventListener("click", () => openEditor(null));
+    $("f-role").addEventListener("change", () => fillSimilarOptions($("f-similar").value));
+
+    $("edit-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const existing = editingId ? findQuestion(editingId) : null;
+      const role = $("f-role").value;
+      const nextOrder = Math.max(0, ...questions.filter((q) => q.role === role).map((q) => q.order || 0)) + 1;
+      const payload = {
+        role,
+        difficulty: $("f-difficulty").value,
+        category: $("f-category").value.trim() || "General",
+        question: $("f-question").value.trim(),
+        points: $("f-points").value.split("\n").map((p) => p.trim()).filter(Boolean),
+        project: $("f-project").value.trim(),
+        tip: $("f-tip").value.trim(),
+        similar: $("f-similar").value,
+        order: existing && existing.role === role ? existing.order || nextOrder : nextOrder,
+        custom: existing ? Boolean(existing.custom) : true,
+      };
+      if (!payload.question || !payload.points.length) {
+        $("edit-error").textContent = "Please enter a question and at least one key point.";
+        $("edit-error").hidden = false;
+        return;
+      }
+      const id = editingId || `${ROLES[role].prefix}-c${Date.now().toString(36)}`;
+      $("edit-save").disabled = true;
+      try {
+        const data = await trackSave(api("PUT", `/prep/questions/${id}`, payload));
+        const saved = normalize(data.question);
+        questions = questions.filter((q) => q.id !== id).concat(saved);
+        sortQuestions();
+        $("edit-dialog").close();
+        renderCategoryOptions();
+        if (state.tab !== "all") state.tab = role;
+        goToQuestion(id);
+      } catch (error) {
+        if (!(error instanceof AuthError)) {
+          $("edit-error").textContent = error.message;
+          $("edit-error").hidden = false;
+        }
+      } finally {
+        $("edit-save").disabled = false;
+      }
+    });
+
+    async function deleteQuestion(q) {
+      if (!confirm(`Delete "${q.question}"?\nYour notes for it will be deleted too.`)) return;
+      try {
+        await trackSave(api("DELETE", `/prep/questions/${q.id}`));
+        questions = questions.filter((x) => x.id !== q.id);
+        state.open.delete(q.id);
+        renderCategoryOptions();
+        render();
+      } catch { /* status already shown */ }
+    }
+
+    // ---------- Practice mode ----------
+    let practiceCurrent = null;
+
+    function nextPractice() {
+      const pool = filteredQuestions();
+      if (!pool.length) {
+        practiceCurrent = null;
+        $("practice-meta").replaceChildren();
+        $("practice-question").textContent = "No questions match your current filters.";
+        $("practice-answer").hidden = true;
+        return;
+      }
+      let pick = pool[Math.floor(Math.random() * pool.length)];
+      if (pool.length > 1 && practiceCurrent && pick.id === practiceCurrent.id) pick = pool[(pool.indexOf(pick) + 1) % pool.length];
+      practiceCurrent = pick;
+      $("practice-meta").replaceChildren(
+        el("span", { class: `chip ${pick.role}`, text: ROLES[pick.role].name }),
+        el("span", { class: "chip cat", text: pick.category }),
+        el("span", { class: `chip ${pick.difficulty}`, text: pick.difficulty }),
+      );
+      $("practice-question").textContent = pick.question;
+      $("practice-answer").replaceChildren(
+        el("ul", {}, pick.points.map((p) => el("li", {}, rich(p)))),
+        pick.project ? el("div", { class: "callout project" }, el("strong", { text: "📌 In your project" }), el("p", {}, rich(pick.project))) : null,
+        pick.tip ? el("div", { class: "callout tip" }, el("strong", { text: "💡 Tip" }), el("p", {}, rich(pick.tip))) : null,
+        pick.notes ? el("div", { class: "callout similar-box" }, el("div", {}, el("strong", { text: "📝 Your notes" }), el("p", { text: pick.notes }))) : null,
+      );
+      $("practice-answer").hidden = true;
+      $("practice-hint").hidden = false;
+      $("practice-reveal").hidden = false;
+      $("practice-done").textContent = pick.practiced ? "✓ Practiced" : "✓ Mark practiced";
+    }
+
+    $("practice-btn").addEventListener("click", () => { nextPractice(); $("practice-dialog").showModal(); });
+    $("practice-next").addEventListener("click", nextPractice);
+    $("practice-reveal").addEventListener("click", () => {
+      $("practice-answer").hidden = false;
+      $("practice-hint").hidden = true;
+      $("practice-reveal").hidden = true;
+    });
+    $("practice-done").addEventListener("click", async () => {
+      const q = practiceCurrent;
+      if (!q || q.practiced) return;
+      q.practiced = true;
+      $("practice-done").textContent = "✓ Practiced";
+      try {
+        await trackSave(api("PATCH", `/prep/questions/${q.id}`, { practiced: true }));
+        render();
+      } catch {
+        q.practiced = false;
+        $("practice-done").textContent = "✓ Mark practiced";
+      }
+    });
+
+    // ---------- Backup ----------
+    $("backup-btn").addEventListener("click", () => {
+      const backup = {
+        exportedAt: new Date().toISOString(),
+        questions: questions.map(({ id, ...rest }) => ({ questionId: id, ...rest })),
+      };
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+      const link = el("a", { href: URL.createObjectURL(blob), download: `interview-prep-backup-${new Date().toISOString().slice(0, 10)}.json` });
+      document.body.append(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(link.href);
+    });
+
+    // ---------- Sign-in form ----------
+    $("login-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const email = $("login-email").value.trim();
+      const password = $("login-password").value;
+      $("login-error").hidden = true;
+      if (!email || !password) {
+        $("login-error").textContent = "Enter your email and password.";
+        $("login-error").hidden = false;
+        return;
+      }
+      $("login-btn").disabled = true;
+      try {
+        await signIn(email, password);
+        $("login-password").value = "";
+        await showApp();
+      } catch (error) {
+        $("login-error").textContent = error.message;
+        $("login-error").hidden = false;
+      } finally {
+        $("login-btn").disabled = false;
+      }
+    });
+
+    $("signout-btn").addEventListener("click", () => signOut("You've signed out."));
+
+    // ---------- Toolbar ----------
+    document.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", () => b.closest("dialog").close()));
+    document.querySelectorAll(".tab").forEach((tab) => tab.addEventListener("click", () => { state.tab = tab.dataset.tab; render(); }));
+    $("search").addEventListener("input", (e) => { state.search = e.target.value; render(); });
+    $("category").addEventListener("change", (e) => { state.category = e.target.value; render(); });
+    $("difficulty").addEventListener("change", (e) => { state.difficulty = e.target.value; render(); });
+    $("shared-only").addEventListener("change", (e) => { state.sharedOnly = e.target.checked; render(); });
+    $("hide-practiced").addEventListener("change", (e) => { state.hidePracticed = e.target.checked; render(); });
+    $("expand-btn").addEventListener("click", () => { filteredQuestions().forEach((q) => state.open.add(q.id)); render(); });
+    $("collapse-btn").addEventListener("click", () => { state.open.clear(); render(); });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "/" && !$("app-view").hidden && !["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement.tagName)) {
+        e.preventDefault();
+        $("search").focus();
+      }
+    });
+
+    // ---------- Theme (shared with the main app) ----------
+    $("theme-toggle").addEventListener("click", () => {
+      const explicit = document.documentElement.dataset.theme;
+      const current = explicit || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      const next = current === "dark" ? "light" : "dark";
+      document.documentElement.dataset.theme = next;
+      storage("local", "theme", next);
+    });
+
+    // ---------- Start ----------
+    if (!API || !COGNITO_CLIENT_ID) {
+      showLogin("Setup needed: add COGNITO_CLIENT_ID to frontend/config.js (see DEVELOPER.md).");
+      $("login-btn").disabled = true;
+    } else if (storage("session", TOKEN_KEY)) {
+      showApp();
+    } else {
+      showLogin();
+    }
+  </script>
+</body>
+</html>

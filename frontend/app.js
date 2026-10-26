@@ -333,3 +333,16 @@ $("analyze-another").addEventListener("click", () => {
   updateDropzone();
   showSection("upload");
 });
+
+// ---------- Developer link ----------
+// Hidden for visitors. Open the site once with ?dev=1 to show it in this browser
+// (?dev=0 hides it again). Signing in to the developer page also enables it.
+// This only controls visibility; the developer page itself requires a sign-in.
+(function () {
+  try {
+    const flag = new URLSearchParams(location.search).get("dev");
+    if (flag === "1") localStorage.setItem("devLink", "1");
+    if (flag === "0") localStorage.removeItem("devLink");
+    $("dev-link").hidden = localStorage.getItem("devLink") !== "1";
+  } catch { /* storage unavailable: keep the link hidden */ }
+})();
