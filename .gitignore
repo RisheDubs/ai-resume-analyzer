@@ -6,3 +6,5 @@ __pycache__/
 *.pem
 sample-resumes/
 .DS_Store
+dev-data/
+*.backup.yaml

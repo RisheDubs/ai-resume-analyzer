@@ -31,8 +31,8 @@ Resources:
       Name: !Sub "${AWS::StackName}-api"
       StageName: Prod
       Cors:
-        AllowMethods: "'GET,POST,OPTIONS'"
-        AllowHeaders: "'Content-Type'"
+        AllowMethods: "'GET,POST,PUT,PATCH,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,Authorization'"
         AllowOrigin: !Sub "'https://${WebsiteDistribution.DomainName}'"
         MaxAge: "'600'"
       MethodSettings:
@@ -41,6 +41,11 @@ Resources:
           ThrottlingRateLimit: 5      # steady requests per second
           ThrottlingBurstLimit: 10    # short bursts allowed
           MetricsEnabled: true
+      # Login check for the developer-only routes (other routes stay public)
+      Auth:
+        Authorizers:
+          DevCognitoAuthorizer:
+            UserPoolArn: !GetAtt DevUserPool.Arn
       GatewayResponses:
         # Add CORS headers to API Gateway's own errors (e.g. 429 throttling)
         # so the browser can read them instead of showing a CORS error
@@ -129,7 +134,7 @@ Resources:
     Properties:
       CodeUri: process_resume/
       Handler: app.lambda_handler
-      Timeout: 180
+      Timeout: 300
       MemorySize: 256
       Environment:
         Variables:
@@ -254,6 +259,116 @@ Resources:
             Condition:
               StringEquals:
                 AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${WebsiteDistribution}"
+
+  # ---------- Developer portal: login (only you can sign in) ----------
+  DevUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub "${AWS::StackName}-dev"
+      UsernameAttributes: [email]
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: true      # no public sign-up: users can only be created by you via the CLI
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 12
+          RequireLowercase: true
+          RequireUppercase: true
+          RequireNumbers: true
+          RequireSymbols: false
+      AccountRecoverySetting:
+        RecoveryMechanisms:
+          - Name: admin_only
+            Priority: 1
+
+  DevUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref DevUserPool
+      ClientName: dev-portal
+      GenerateSecret: false                 # browser app: no client secret
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+      PreventUserExistenceErrors: ENABLED
+      IdTokenValidity: 60
+      AccessTokenValidity: 60
+      RefreshTokenValidity: 1
+      TokenValidityUnits:
+        IdToken: minutes
+        AccessToken: minutes
+        RefreshToken: days
+
+  # ---------- Developer portal: your questions, answers and progress ----------
+  PrepTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain                  # keep your notes even if the stack is deleted
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub "${AWS::StackName}-prep"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: questionId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+        - AttributeName: questionId
+          KeyType: RANGE
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true    # restore to any second in the last 35 days
+
+  PrepApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: prep_api/
+      Handler: app.lambda_handler
+      Environment:
+        Variables:
+          PREP_TABLE: !Ref PrepTable
+          ALLOWED_ORIGIN: !Sub "https://${WebsiteDistribution.DomainName}"
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:Query
+                - dynamodb:UpdateItem
+                - dynamodb:DeleteItem
+              Resource: !GetAtt PrepTable.Arn
+      Events:
+        ListQuestions:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ResumeApi
+            Path: /prep/questions
+            Method: get
+            Auth:
+              Authorizer: DevCognitoAuthorizer
+        PutQuestion:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ResumeApi
+            Path: /prep/questions/{questionId}
+            Method: put
+            Auth:
+              Authorizer: DevCognitoAuthorizer
+        PatchQuestion:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ResumeApi
+            Path: /prep/questions/{questionId}
+            Method: patch
+            Auth:
+              Authorizer: DevCognitoAuthorizer
+        DeleteQuestion:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ResumeApi
+            Path: /prep/questions/{questionId}
+            Method: delete
+            Auth:
+              Authorizer: DevCognitoAuthorizer
 
   # ---------- Monitoring: alerts ----------
   AlarmTopic:
@@ -426,3 +541,15 @@ Outputs:
   MonitoringDashboardUrl:
     Description: CloudWatch dashboard for the app
     Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/cloudwatch/home?region=${AWS::Region}#dashboards:name=${AWS::StackName}"
+  DevUserPoolId:
+    Description: Cognito user pool for the developer portal
+    Value: !Ref DevUserPool
+  DevUserPoolClientId:
+    Description: Cognito app client ID (put this in frontend/config.js)
+    Value: !Ref DevUserPoolClient
+  PrepTableName:
+    Description: DynamoDB table holding interview prep questions and notes
+    Value: !Ref PrepTable
+  DevPortalUrl:
+    Description: Developer-only interview prep page
+    Value: !Sub "https://${WebsiteDistribution.DomainName}/dev/index.html"
