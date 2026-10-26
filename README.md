@@ -224,6 +224,9 @@ Set your API URL in `frontend/config.js`.
 - [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html)
 - Python 3.11
 
+### Developer tools
+A private interview-prep portal (Cognito sign-in, answers stored in DynamoDB) is documented in [DEVELOPER.md](DEVELOPER.md).
+
 ### Deploy
 ```bash
 cd backend/app
