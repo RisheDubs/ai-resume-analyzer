@@ -1,0 +1,56 @@
+/* Legal pages (privacy, terms): light and dark, same type and palette as the site */
+:root {
+  --bg: #ffffff; --ink: #14121a; --muted: #5b5666; --line: #e7e4ee; --soft: #f6f4fb; --accent: #6d4fe0; --accent-ink: #4b33b8;
+  --nav-surface: #e3e3e3; --nav-item: #ffffff; --nav-ink: #1a1a1a; --nav-cta: #0d0d0d; --nav-cta-ink: #f4f4f4;
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --bg: #0b0a10; --ink: #ebe8f2; --muted: #a29eb0; --line: #24212d; --soft: #15131c; --accent: #a58dff; --accent-ink: #c4b5ff;
+  --nav-surface: #2a2733; --nav-item: #16141c; --nav-ink: #ebe8f2; --nav-cta: #f1eef7; --nav-cta-ink: #120f18;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scroll-padding-top: 90px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Zen Kaku Gothic New", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 16.5px; line-height: 1.7; transition: background-color 350ms ease, color 350ms ease; }
+a { color: var(--accent-ink); text-underline-offset: 3px; }
+a:hover { color: var(--accent); }
+.lg-top { position: sticky; top: 0; z-index: 50; display: flex; align-items: center; height: 76px; padding: 0 max(4vmin, 16px);
+  background: color-mix(in srgb, var(--bg) 86%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.lg-back { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font-weight: 500; font-size: 15px;
+  padding: 8px 14px 8px 10px; border-radius: 9px; background: var(--soft); border: 1px solid var(--line); }
+.lg-back:hover { color: var(--ink); border-color: var(--accent); }
+.lg-back img { width: 18px; height: 18px; }
+:root[data-theme="dark"] .lg-back img { filter: invert(1); }
+.lg-doc { max-width: 760px; margin: 0 auto; padding: 56px max(4vmin, 16px) 40px; }
+.lg-kicker { margin: 0 0 10px; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-ink); font-weight: 700; }
+h1 { font-size: clamp(36px, 7vw, 60px); line-height: 1.05; letter-spacing: -0.02em; font-weight: 500; margin: 0 0 14px; }
+.lg-meta { color: var(--muted); margin: 0 0 32px; font-size: 15px; }
+.lg-summary { background: var(--soft); border: 1px solid var(--line); border-radius: 16px; padding: 22px 24px; margin: 0 0 36px; }
+.lg-summary h2 { margin: 0 0 8px; font-size: 18px; }
+.lg-summary ul { margin: 0; padding-left: 20px; }
+.lg-summary li { margin: 4px 0; }
+.lg-toc { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 18px 0; margin: 0 0 12px; }
+.lg-toc p { margin: 0 0 8px; font-weight: 700; font-size: 14px; color: var(--muted); }
+.lg-toc ol { margin: 0; padding-left: 22px; columns: 2; column-gap: 28px; font-size: 15px; }
+.lg-toc li { margin: 3px 0; break-inside: avoid; }
+@media (max-width: 600px) { .lg-toc ol { columns: 1; } }
+h2 { font-size: 24px; line-height: 1.25; font-weight: 700; margin: 44px 0 10px; letter-spacing: -0.01em; }
+h3 { font-size: 17px; margin: 22px 0 6px; }
+p, li { color: var(--ink); }
+ul, ol { padding-left: 22px; }
+li { margin: 6px 0; }
+.lg-muted { color: var(--muted); }
+.lg-table { width: 100%; border-collapse: collapse; margin: 14px 0 6px; font-size: 15px; }
+.lg-table th, .lg-table td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+.lg-table th { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 700; }
+.lg-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.lg-note { border-left: 3px solid var(--accent); padding: 4px 0 4px 16px; margin: 18px 0; color: var(--ink); }
+.lg-caps { text-transform: uppercase; font-size: 14.5px; letter-spacing: 0.01em; }
+mark.fill { background: #ffe27a; color: #14121a; padding: 0 4px; border-radius: 4px; }
+.lg-foot { max-width: 760px; margin: 0 auto; padding: 28px max(4vmin, 16px) 56px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px;
+  display: flex; flex-wrap: wrap; gap: 8px 18px; justify-content: space-between; }
+.lg-foot a { color: var(--ink); }
+.lg-foot nav { display: flex; gap: 16px; flex-wrap: wrap; }
+@media print { .lg-top, .prefs, #meteor-cursor { display: none !important; } body { font-size: 12pt; } }
