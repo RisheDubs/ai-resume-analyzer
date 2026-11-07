@@ -1,925 +1,823 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="noindex, nofollow">
-  <title>Developer · Interview Prep</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
-  <script>
-    try {
-      const saved = localStorage.getItem("theme");
-      if (saved) document.documentElement.dataset.theme = saved;
-    } catch (e) {}
-  </script>
-  <style>
-    /* ---------- Theme (same tokens as the main dashboard) ---------- */
-    :root {
-      color-scheme: light;
-      --bg: #f5f7fb; --card: #ffffff; --text: #1f2937; --muted: #6b7280;
-      --border: #e5e7eb; --input-bg: #ffffff; --track: #e5e7eb;
-      --primary: #4f46e5; --primary-hover: #4338ca; --primary-soft: #eef2ff; --on-primary: #ffffff;
-      --good: #16a34a; --good-soft: #dcfce7; --ok: #d97706; --ok-soft: #fef3c7;
-      --bad: #dc2626; --bad-soft: #fee2e2;
-      --cloud: #0284c7; --cloud-soft: #e0f2fe; --dev: #7c3aed; --dev-soft: #ede9fe;
-      --radius: 14px;
-      --shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 6px 24px rgba(0, 0, 0, 0.04);
-    }
-    @media (prefers-color-scheme: dark) {
-      :root:not([data-theme="light"]) {
-        color-scheme: dark;
-        --bg: #0f172a; --card: #1e293b; --text: #e2e8f0; --muted: #94a3b8;
-        --border: #334155; --input-bg: #0f172a; --track: #334155;
-        --primary: #818cf8; --primary-hover: #a5b4fc; --primary-soft: #312e81; --on-primary: #0f172a;
-        --good: #4ade80; --good-soft: #14532d; --ok: #fbbf24; --ok-soft: #451a03;
-        --bad: #f87171; --bad-soft: #450a0a;
-        --cloud: #38bdf8; --cloud-soft: #0c4a6e; --dev: #c4b5fd; --dev-soft: #3b0764;
-        --shadow: none;
-      }
-    }
-    :root[data-theme="dark"] {
-      color-scheme: dark;
-      --bg: #0f172a; --card: #1e293b; --text: #e2e8f0; --muted: #94a3b8;
-      --border: #334155; --input-bg: #0f172a; --track: #334155;
-      --primary: #818cf8; --primary-hover: #a5b4fc; --primary-soft: #312e81; --on-primary: #0f172a;
-      --good: #4ade80; --good-soft: #14532d; --ok: #fbbf24; --ok-soft: #451a03;
-      --bad: #f87171; --bad-soft: #450a0a;
-      --cloud: #38bdf8; --cloud-soft: #0c4a6e; --dev: #c4b5fd; --dev-soft: #3b0764;
-      --shadow: none;
-    }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Admin · Interview Prep</title>
+<link rel="stylesheet" href="../assets/fonts.css">
+<style>
+  /* Layout: signed out, a split screen (violet showcase + glass sign-in panel).
+     Signed in, a single working column: header with progress ring, role switch,
+     a glass toolbar, then one expandable glass card per question.
+     Single dark theme to match the main site, with every color set explicitly. */
+  :root {
+    color-scheme: dark;
+    --black: #000000;
+    --paper: #f5f1ec;
+    --ink: #07031a;
+    --white: #ffffff;
+    --muted: rgba(245, 241, 236, 0.62);
+    --faint: rgba(245, 241, 236, 0.4);
+    --glass: rgba(40, 36, 33, 0.55);
+    --surface: rgba(20, 16, 34, 0.72);
+    --surface-2: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.14);
+    --violet: #9a73f0;
+    --violet-deep: #6d28d9;
+    --violet-soft: #ddd6fe;
+    --lilac: #c4b5fd;
+    --pink: #f9a8d4;
+    --good: #8de3a8;
+    --ok: #f5c46b;
+    --bad: #ff8fa3;
+    --nav-surface: #e3e3e3;
+    --nav-item: #ffffff;
+    --nav-ink: #1a1a1a;
+    --card-violet: radial-gradient(95% 80% at 50% 28%, #ddd6fe 0%, #9a73f0 38%, #6d28d9 68%, #34146e 100%);
+    --radius-card: 3vmin;
+    --font: "Zen Kaku Gothic New", "Hiragino Sans", "Segoe UI", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  [hidden] { display: none !important; }
+  html, body { min-height: 100%; }
+  :root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  body { background: var(--black); color: var(--paper); font-family: var(--font); line-height: 1.5; }
+  body::before { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background: radial-gradient(45% 35% at 100% 100%, rgba(109,40,217,0.35), transparent 70%), radial-gradient(35% 30% at 0% 0%, rgba(154,115,240,0.18), transparent 70%); }
+  button { font: inherit; cursor: pointer; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--violet); outline-offset: 3px; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: 0.88em; padding: 1px 6px; border-radius: 6px; background: rgba(154,115,240,0.18); color: var(--violet-soft); }
 
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; background: var(--bg); color: var(--text);
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; line-height: 1.55;
-    }
-    a { color: var(--primary); }
-    .container { max-width: 980px; margin: 0 auto; padding: 24px 16px 48px; }
-    .muted { color: var(--muted); }
-    .small { font-size: 0.85rem; }
-    code {
-      font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: 0.88em;
-      background: var(--primary-soft); color: var(--primary); padding: 1px 6px; border-radius: 6px;
-    }
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+  .page {
+    position: relative; z-index: 1; min-height: 100vh; display: grid; grid-template-rows: auto 1fr; gap: 3vmin;
+    padding-block: 3vmin;
+    padding-left: max(3vmin, 16px, env(safe-area-inset-left, 0px));
+    padding-right: max(3vmin, 16px, env(safe-area-inset-right, 0px));
+  }
 
-    /* ---------- Top bar ---------- */
-    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
-    .topbar a { text-decoration: none; font-weight: 600; font-size: 0.92rem; }
-    .topbar-right { display: flex; align-items: center; gap: 8px; }
-    .icon-btn {
-      width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border);
-      background: var(--card); font-size: 1.1rem; cursor: pointer;
-    }
-    .icon-btn:hover { background: var(--primary-soft); }
+  /* ---------- Top bar ---------- */
+  .bar { position: sticky; top: calc(10px + env(safe-area-inset-top, 0px)); z-index: 20; display: flex; justify-content: center; }
+  .bar nav { display: flex; gap: 1px; padding: 1px; border-radius: 9px; background: var(--nav-surface); box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+  .tile { height: 40px; border-radius: 8px; display: grid; place-items: center; text-decoration: none; color: var(--nav-ink); background: var(--nav-item); font-size: 15px; border: 0; }
+  .tile.logo { width: 40px; background: #dadada; }
+  .tile.logo svg { width: 18px; height: 18px; transition: transform 500ms cubic-bezier(.65,0,.35,1); }
+  .tile.logo:hover svg { transform: rotate(90deg); }
+  .tile.back, .tile.here, .tile.out { padding: 0 18px; gap: 8px; display: inline-flex; align-items: center; }
+  .tile.back:hover span, .tile.out:hover span { opacity: 0.55; }
+  .tile.here { background: #0d0d0d; color: #f4f4f4; }
+  .tile svg.lock { width: 15px; height: 15px; }
 
-    .page-header { text-align: center; margin-bottom: 24px; }
-    .eyebrow {
-      display: inline-block; margin-bottom: 10px; padding: 4px 12px; border-radius: 999px;
-      background: var(--primary-soft); color: var(--primary); font-size: 0.8rem; font-weight: 600;
-    }
-    .page-header h1 { margin: 0 0 6px; font-size: clamp(1.7rem, 4vw, 2.3rem); letter-spacing: -0.02em; }
-    .page-header p { margin: 0; color: var(--muted); }
+  /* ---------- Sign-in (split) ---------- */
+  .split { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 3vmin; }
+  .show { position: relative; overflow: hidden; border-radius: var(--radius-card); background: #0a0618; min-height: 520px; display: flex; flex-direction: column; justify-content: space-between; padding: clamp(24px, 4.5vmin, 56px); }
+  .show > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .blob { position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.75; animation: drift 14s ease-in-out infinite alternate; }
+  .blob.a { width: 60%; aspect-ratio: 1; left: -10%; bottom: -20%; background: #6d28d9; }
+  .blob.b { width: 45%; aspect-ratio: 1; right: -8%; top: 10%; background: #c4a8ff; opacity: 0.35; animation-duration: 18s; }
+  @keyframes drift { to { transform: translate(8%, -6%) scale(1.12); } }
+  .show > *:not(img):not(.blob) { position: relative; z-index: 1; }
+  .star { width: clamp(64px, 9vmin, 104px); aspect-ratio: 1; background: var(--white); -webkit-mask: url(../assets/star.svg) center / contain no-repeat; mask: url(../assets/star.svg) center / contain no-repeat; filter: drop-shadow(0 0 24px rgba(221,214,254,0.8)); animation: spin 18s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .big { font-size: clamp(44px, 7.4vw, 132px); font-weight: 400; line-height: 0.95; letter-spacing: -0.03em; display: flex; flex-direction: column; color: var(--white); text-wrap: balance; }
+  .big .dim { opacity: 0.45; }
+  .show p { max-width: 30rem; font-size: clamp(15px, 1.25vw, 18px); color: rgba(245,241,236,0.82); margin-top: 18px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+  .chip { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 999px; font-size: 13px; background: var(--glass); border: 1px solid var(--glass-border); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .chip i { width: 6px; height: 6px; border-radius: 50%; background: var(--good); box-shadow: 0 0 8px var(--good); }
+  .panel { position: relative; border-radius: var(--radius-card); border: 1px solid var(--glass-border); background: radial-gradient(90% 60% at 100% 100%, rgba(109,40,217,0.35), transparent 70%), rgba(18, 14, 30, 0.9); padding: clamp(24px, 5vmin, 64px); display: flex; flex-direction: column; justify-content: center; gap: 28px; min-width: 0; }
+  .panel-head { display: grid; gap: 10px; }
+  .lock-badge { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.06); }
+  .lock-badge svg { width: 24px; height: 24px; }
+  .panel h2 { font-size: clamp(30px, 3vw, 44px); font-weight: 400; letter-spacing: -0.02em; line-height: 1.05; }
+  .sub { color: var(--muted); font-size: 15px; max-width: 26rem; }
+  .login-form { display: grid; gap: 18px; max-width: 440px; width: 100%; }
+  .field { display: grid; gap: 8px; min-width: 0; }
+  .field label, .lab { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+  .input { position: relative; display: flex; align-items: center; }
+  input[type="text"], input[type="email"], input[type="password"], input[type="search"], select, textarea {
+    width: 100%; font: inherit; font-size: 16px; color: var(--paper); background: rgba(255,255,255,0.05);
+    border: 1px solid var(--glass-border); border-radius: 10px; padding: 13px 14px; transition: border-color 200ms, box-shadow 200ms;
+  }
+  select { appearance: none; -webkit-appearance: none; padding-right: 38px; background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%); background-position: calc(100% - 20px) 55%, calc(100% - 15px) 55%; background-size: 5px 5px; background-repeat: no-repeat; }
+  select option { background: #160f2a; color: var(--paper); }
+  input::placeholder, textarea::placeholder { color: rgba(245,241,236,0.35); }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--violet); box-shadow: 0 0 0 3px rgba(154,115,240,0.25); }
+  textarea { resize: vertical; min-height: 96px; line-height: 1.55; }
+  .input.has-toggle input { padding-right: 68px; }
+  .toggle { position: absolute; right: 8px; border: 0; background: transparent; color: var(--muted); font-size: 13px; padding: 8px 10px; border-radius: 8px; }
+  .toggle:hover { color: var(--paper); background: rgba(255,255,255,0.06); }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 18px; border-radius: 8px; font-size: 15px; text-decoration: none; border: 1px solid var(--glass-border); background: var(--surface-2); color: var(--paper); line-height: 1.2; transition: background 180ms, transform 150ms; white-space: nowrap; }
+  .btn:hover { background: rgba(255,255,255,0.11); }
+  .btn.primary { background: var(--paper); color: var(--ink); border-color: transparent; font-weight: 500; }
+  .btn.primary:hover { background: var(--white); }
+  .btn.danger { color: var(--bad); border-color: rgba(255,143,163,0.4); }
+  .btn.danger:hover { background: rgba(255,143,163,0.12); }
+  .btn.small { padding: 8px 12px; font-size: 13px; }
+  .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+  .submit { margin-top: 6px; padding: 15px 22px; font-size: 17px; }
+  .spinner { width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(7,3,26,0.25); border-top-color: var(--ink); animation: spin 0.8s linear infinite; }
+  .error { color: var(--bad); font-size: 14px; min-height: 1.2em; }
+  .fine { color: var(--muted); font-size: 13px; display: flex; gap: 8px; align-items: flex-start; max-width: 440px; }
+  .fine svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px; }
+  .preview-tag { align-self: flex-start; font-size: 12px; padding: 5px 12px; border-radius: 999px; border: 1px dashed rgba(221,214,254,0.5); color: var(--violet-soft); }
 
-    /* ---------- Buttons & inputs ---------- */
-    button { font: inherit; cursor: pointer; }
-    .btn {
-      display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; border-radius: 10px;
-      font-weight: 600; font-size: 0.92rem; border: 1px solid var(--primary);
-      background: transparent; color: var(--primary); transition: background 0.15s;
-    }
-    .btn:hover { background: var(--primary-soft); }
-    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-    .btn.primary { background: var(--primary); color: var(--on-primary); }
-    .btn.primary:hover { background: var(--primary-hover); }
-    .btn.ghost { border-color: var(--border); color: var(--text); }
-    .btn.ghost:hover { background: var(--bg); }
-    .btn.danger { border-color: var(--bad); color: var(--bad); }
-    .btn.danger:hover { background: var(--bad-soft); }
-    input[type="text"], input[type="email"], input[type="password"], input[type="search"], select, textarea {
-      width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 10px;
-      background: var(--input-bg); color: var(--text); font: inherit;
-    }
-    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
-    textarea { resize: vertical; }
-    .error { color: var(--bad); font-size: 0.9rem; margin: 12px 0 0; }
+  /* ---------- Prep app ---------- */
+  .app { display: grid; gap: 22px; width: 100%; max-width: 1080px; margin: 0 auto; align-content: start; }
+  .app-head { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-end; justify-content: space-between; padding-top: 2vmin; }
+  .app-head .big { font-size: clamp(44px, 7vw, 104px); }
+  .app-head p { color: var(--muted); max-width: 30rem; margin-top: 14px; }
+  .ring-box { display: flex; align-items: center; gap: 16px; padding: 14px 18px; border-radius: 18px; background: var(--surface); border: 1px solid var(--glass-border); }
+  .ring { position: relative; width: 84px; aspect-ratio: 1; flex-shrink: 0; }
+  .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible; }
+  .ring circle { fill: none; stroke-width: 9; }
+  .ring .track { stroke: rgba(255,255,255,0.1); }
+  .ring .fill { stroke: url(#ringGrad); stroke-linecap: round; transition: stroke-dashoffset 700ms cubic-bezier(.2,.8,.2,1); filter: drop-shadow(0 0 6px rgba(154,115,240,0.7)); }
+  .ring b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 20px; font-weight: 500; font-variant-numeric: tabular-nums; }
+  .ring-box strong { display: block; font-weight: 500; font-size: 17px; }
+  .ring-box span { color: var(--muted); font-size: 13px; }
+  .save { font-size: 13px; color: var(--muted); }
+  .save.saving { color: var(--ok); } .save.saved { color: var(--good); } .save.failed { color: var(--bad); }
 
-    /* ---------- Login ---------- */
-    .login { max-width: 420px; margin: 40px auto; padding: 28px; }
-    .login h2 { margin: 0 0 4px; }
-    .login label { display: block; font-weight: 600; font-size: 0.9rem; margin: 16px 0 6px; }
-    .login .btn { width: 100%; justify-content: center; margin-top: 20px; padding: 11px; }
+  /* Role switch: a sliding black highlight, like the main site's nav */
+  .seg { position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; padding: 1px; border-radius: 10px; background: var(--nav-surface); }
+  .seg-ind { position: absolute; top: 1px; left: 0; bottom: 1px; z-index: 1; border-radius: 9px; background: #0d0d0d; transition: transform 480ms cubic-bezier(.65,0,.35,1), width 480ms cubic-bezier(.65,0,.35,1); pointer-events: none; }
+  .seg button { position: relative; border: 0; background: var(--nav-item); border-radius: 9px; padding: 10px 8px; color: var(--nav-ink); display: grid; gap: 1px; justify-items: center; }
+  .seg button > * { position: relative; z-index: 2; transition: color 350ms ease; }
+  .seg button b { font-weight: 500; font-size: 15px; }
+  .seg button small { font-size: 12px; opacity: 0.6; }
+  .seg button.on > * { color: #f4f4f4; }
+  .seg.no-anim .seg-ind { transition: none; }
 
-    /* ---------- Tabs ---------- */
-    .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 6px; margin-bottom: 16px; }
-    .tab {
-      display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 12px 8px;
-      border: none; border-radius: 10px; background: transparent; color: var(--muted); font-weight: 600;
-    }
-    .tab .count { font-size: 0.78rem; font-weight: 500; }
-    .tab:hover { background: var(--bg); }
-    .tab[aria-selected="true"] { background: var(--primary-soft); color: var(--primary); }
-    .tab[data-tab="cloud"][aria-selected="true"] { background: var(--cloud-soft); color: var(--cloud); }
-    .tab[data-tab="dev"][aria-selected="true"] { background: var(--dev-soft); color: var(--dev); }
+  .toolbar { display: grid; gap: 14px; padding: 16px; border-radius: 18px; background: var(--surface); border: 1px solid var(--glass-border); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+  .filters { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+  .filters input, .filters select { padding: 11px 14px; font-size: 15px; }
+  .tool-row { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; justify-content: space-between; }
+  .checks { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+  .check { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); cursor: pointer; }
+  .check input { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; border-radius: 6px; border: 1.5px solid rgba(255,255,255,0.3); display: grid; place-items: center; margin: 0; cursor: pointer; transition: background 200ms, border-color 200ms; }
+  .check input:checked { background: var(--violet); border-color: var(--violet); }
+  .check input:checked::after { content: "\2713"; color: var(--ink); font-size: 12px; font-weight: 700; }
+  .check:hover { color: var(--paper); }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; }
 
-    /* ---------- Toolbar ---------- */
-    .toolbar { padding: 16px; margin-bottom: 16px; }
-    .filters { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; }
-    .toggles { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; align-items: center; }
-    .toggles label { display: inline-flex; align-items: center; gap: 6px; font-size: 0.9rem; cursor: pointer; }
-    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
-    .actions .spacer { flex: 1; }
-    .progress-wrap { margin-top: 14px; }
-    .progress-label { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; }
-    .progress { height: 8px; border-radius: 999px; background: var(--track); overflow: hidden; }
-    .progress-fill { height: 100%; width: 0; background: var(--good); border-radius: 999px; transition: width 0.4s ease-out; }
-    .save-status { font-size: 0.82rem; color: var(--muted); }
-    .save-status.saving { color: var(--ok); }
-    .save-status.saved { color: var(--good); }
-    .save-status.failed { color: var(--bad); }
+  .list { display: grid; gap: 10px; }
+  .q { border-radius: 16px; background: var(--surface); border: 1px solid var(--glass-border); transition: border-color 250ms, box-shadow 250ms, background 250ms; }
+  .q:hover { border-color: rgba(221,214,254,0.3); }
+  .q.open { background: rgba(26, 20, 44, 0.85); }
+  .q.flash { border-color: var(--violet); box-shadow: 0 0 0 4px rgba(154,115,240,0.25); }
+  .q-head { display: flex; align-items: flex-start; gap: 14px; padding: 16px 18px; }
+  .q-toggle { flex: 1; min-width: 0; display: flex; align-items: flex-start; gap: 14px; padding: 0; border: 0; background: transparent; color: inherit; text-align: left; }
+  .num { flex-shrink: 0; min-width: 60px; padding: 5px 8px; border-radius: 8px; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-align: center; font-variant-numeric: tabular-nums; }
+  .num.cloud { background: rgba(196,181,253,0.14); color: var(--lilac); border: 1px solid rgba(196,181,253,0.35); }
+  .num.dev { background: rgba(249,168,212,0.12); color: var(--pink); border: 1px solid rgba(249,168,212,0.35); }
+  .q-main { flex: 1; min-width: 0; }
+  .q-title { font-size: clamp(16px, 1.4vw, 18px); font-weight: 500; line-height: 1.4; margin-bottom: 8px; transition: color 250ms; }
+  .q.done .q-title { color: var(--faint); }
+  .meta { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 999px; font-size: 12px; background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); color: var(--muted); }
+  .tag .dot { width: 6px; height: 6px; border-radius: 50%; }
+  .tag.Easy .dot { background: var(--good); } .tag.Medium .dot { background: var(--ok); } .tag.Hard .dot { background: var(--bad); }
+  .tag.sim { border-style: dashed; border-color: rgba(221,214,254,0.45); color: var(--violet-soft); }
+  .tag.role-cloud { color: var(--lilac); } .tag.role-dev { color: var(--pink); }
+  .chev { flex-shrink: 0; width: 22px; height: 22px; color: var(--muted); transition: transform 350ms cubic-bezier(.65,0,.35,1); margin-top: 2px; }
+  .q.open .chev { transform: rotate(180deg); }
+  .tick { flex-shrink: 0; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); cursor: pointer; margin-top: 3px; }
+  .tick input { appearance: none; -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.3); margin: 0; display: grid; place-items: center; cursor: pointer; transition: background 250ms, border-color 250ms, box-shadow 250ms; }
+  .tick input:checked { background: var(--good); border-color: var(--good); box-shadow: 0 0 12px rgba(141,227,168,0.6); }
+  .tick input:checked::after { content: "\2713"; color: var(--ink); font-size: 13px; font-weight: 700; }
 
-    /* ---------- Question cards ---------- */
-    .list { display: flex; flex-direction: column; gap: 10px; }
-    .q-card { overflow: hidden; transition: box-shadow 0.2s, border-color 0.2s; }
-    .q-card.flash { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-soft); }
-    .q-card.is-practiced .q-title { color: var(--muted); }
-    .q-head { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; }
-    .q-toggle { flex: 1; display: flex; align-items: flex-start; gap: 12px; text-align: left; border: none; background: transparent; color: inherit; padding: 0; }
-    .q-num { flex-shrink: 0; min-width: 56px; padding: 4px 8px; border-radius: 8px; font-size: 0.78rem; font-weight: 700; text-align: center; }
-    .q-num.cloud { background: var(--cloud-soft); color: var(--cloud); }
-    .q-num.dev { background: var(--dev-soft); color: var(--dev); }
-    .q-main { flex: 1; min-width: 0; }
-    .q-title { margin: 0 0 6px; font-size: 1.02rem; font-weight: 600; line-height: 1.4; }
-    .q-meta { display: flex; flex-wrap: wrap; gap: 6px; }
-    .chev { flex-shrink: 0; color: var(--muted); transition: transform 0.2s; margin-top: 2px; }
-    .q-card.open .chev { transform: rotate(180deg); }
-    .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 999px; font-size: 0.76rem; font-weight: 600; }
-    .chip.cat { background: var(--primary-soft); color: var(--primary); }
-    .chip.Easy { background: var(--good-soft); color: var(--good); }
-    .chip.Medium { background: var(--ok-soft); color: var(--ok); }
-    .chip.Hard { background: var(--bad-soft); color: var(--bad); }
-    .chip.cloud { background: var(--cloud-soft); color: var(--cloud); }
-    .chip.dev { background: var(--dev-soft); color: var(--dev); }
-    .chip.similar { background: transparent; border: 1px dashed var(--primary); color: var(--primary); }
-    .chip.custom { background: var(--bg); color: var(--muted); border: 1px solid var(--border); }
-    .practiced-toggle { flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--muted); cursor: pointer; margin-top: 3px; }
-    .practiced-toggle input { width: 16px; height: 16px; accent-color: var(--good); cursor: pointer; }
-    .q-body { padding: 0 16px 18px 84px; }
-    .q-body h4 { margin: 4px 0 8px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
-    .q-body ul { margin: 0 0 14px; padding-left: 20px; }
-    .q-body li { margin-bottom: 6px; }
-    .callout { padding: 12px 14px; border-radius: 10px; margin-bottom: 10px; font-size: 0.93rem; }
-    .callout strong { display: block; margin-bottom: 2px; font-size: 0.82rem; }
-    .callout p { margin: 0; }
-    .callout.project { background: var(--primary-soft); }
-    .callout.project strong { color: var(--primary); }
-    .callout.tip { background: var(--ok-soft); }
-    .callout.tip strong { color: var(--ok); }
-    .callout.similar-box { border: 1px dashed var(--primary); display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
-    .notes-label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--muted); margin: 14px 0 6px; }
-    .body-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
-    .empty { padding: 40px 16px; text-align: center; color: var(--muted); }
+  .q-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 420ms cubic-bezier(.65,0,.35,1); }
+  .q.open .q-body { grid-template-rows: 1fr; }
+  .q-inner { overflow: hidden; }
+  .q-content { padding: 0 18px 20px 92px; display: grid; gap: 14px; }
+  .q-content h4 { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--violet-soft); font-weight: 500; }
+  .q-content ul { padding-left: 20px; display: grid; gap: 7px; }
+  .q-content li { line-height: 1.55; }
+  .callout { padding: 12px 14px; border-radius: 12px; font-size: 15px; }
+  .callout strong { display: block; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 4px; }
+  .callout.project { background: rgba(154,115,240,0.14); border: 1px solid rgba(154,115,240,0.3); }
+  .callout.project strong { color: var(--violet-soft); }
+  .callout.tip { background: rgba(245,196,107,0.1); border: 1px solid rgba(245,196,107,0.28); }
+  .callout.tip strong { color: var(--ok); }
+  .callout.sim { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; border: 1px dashed rgba(221,214,254,0.4); }
+  .callout.sim p { flex: 1 1 260px; }
+  .notes-wrap { display: grid; gap: 8px; }
+  .row-end { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; align-items: center; }
+  .confirm { display: inline-flex; flex-wrap: wrap; gap: 8px; align-items: center; color: var(--bad); font-size: 14px; }
+  .empty { padding: 40px 20px; text-align: center; color: var(--muted); border-radius: 16px; border: 1px dashed var(--glass-border); }
 
-    /* ---------- Dialogs ---------- */
-    dialog {
-      width: min(640px, calc(100vw - 32px)); max-height: calc(100vh - 48px); padding: 0;
-      border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); color: var(--text);
-    }
-    dialog::backdrop { background: rgba(15, 23, 42, 0.55); }
-    .dialog-inner { padding: 22px; }
-    .dialog-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
-    .dialog-head h2 { margin: 0; font-size: 1.2rem; }
-    .close-x { border: none; background: transparent; color: var(--muted); font-size: 1.4rem; line-height: 1; padding: 4px; }
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .form-grid .full { grid-column: 1 / -1; }
-    .form-grid label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; }
-    .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
-    .practice-q { font-size: 1.25rem; font-weight: 700; line-height: 1.4; margin: 10px 0 16px; }
-    .practice-answer { border-top: 1px solid var(--border); padding-top: 14px; margin-top: 6px; }
-    .practice-answer ul { padding-left: 20px; margin: 0 0 12px; }
-    .practice-answer li { margin-bottom: 6px; }
+  /* ---------- Overlays ---------- */
+  .overlay { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: max(16px, 3vmin); background: rgba(4, 2, 12, 0.72); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); animation: fadeIn 250ms ease both; overflow-y: auto; }
+  @keyframes fadeIn { from { opacity: 0; } }
+  .sheet { width: min(720px, 100%); border-radius: 22px; border: 1px solid var(--glass-border); background: #120c22; padding: clamp(20px, 4vmin, 36px); display: grid; gap: 18px; animation: rise 380ms cubic-bezier(.2,.8,.2,1) both; max-height: calc(100vh - 32px); overflow-y: auto; }
+  @keyframes rise { from { opacity: 0; transform: translateY(16px) scale(0.98); } }
+  .sheet-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .sheet-head h2 { font-size: 22px; font-weight: 500; }
+  .x { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--glass-border); background: transparent; color: var(--paper); font-size: 18px; line-height: 1; }
+  .x:hover { background: rgba(255,255,255,0.08); }
+  .practice-card { position: relative; overflow: hidden; border-radius: 18px; padding: clamp(22px, 4vmin, 36px); background: var(--card-violet); color: var(--ink); min-height: 220px; display: grid; align-content: space-between; gap: 18px; }
+  .practice-card .meta .tag { background: rgba(7,3,26,0.12); border-color: rgba(7,3,26,0.18); color: var(--ink); }
+  .practice-q { font-size: clamp(22px, 3vw, 32px); line-height: 1.25; font-weight: 500; letter-spacing: -0.01em; }
+  .practice-hint { font-size: 14px; opacity: 0.75; }
+  .practice-answer { display: grid; gap: 12px; animation: rise 380ms cubic-bezier(.2,.8,.2,1) both; }
+  .practice-answer ul { padding-left: 20px; display: grid; gap: 7px; }
+  .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  .form-grid .full { grid-column: 1 / -1; }
 
-    @media (max-width: 680px) {
-      .filters { grid-template-columns: 1fr 1fr; }
-      .filters .search { grid-column: 1 / -1; }
-      .q-body { padding-left: 16px; }
-      .q-head { flex-wrap: wrap; }
-      .practiced-toggle { margin-left: 68px; }
-      .form-grid { grid-template-columns: 1fr; }
-      .actions .spacer { display: none; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { transition: none !important; animation: none !important; }
-    }
-  </style>
+  .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 80; background: var(--paper); color: var(--ink); padding: 10px 16px; border-radius: 8px; font-size: 14px; }
+  .fade-in { animation: fadein 600ms cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes fadein { from { opacity: 0; transform: translateY(10px); filter: blur(6px); } }
+  .shake { animation: shake 380ms ease; }
+  @keyframes shake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+
+  @media (max-width: 900px) {
+    .split { grid-template-columns: 1fr; }
+    .show { min-height: 320px; }
+    .tile .lbl-long { display: none; }
+  }
+  @media (max-width: 760px) {
+    .filters { grid-template-columns: 1fr 1fr; }
+    .filters .search { grid-column: 1 / -1; }
+    .q-head { flex-wrap: wrap; padding: 14px; }
+    .q-toggle { flex-basis: 100%; }
+    .tick { margin-left: 74px; }
+    .q-content { padding: 0 14px 18px; }
+    .form-grid { grid-template-columns: 1fr; }
+    .seg button small { display: none; }
+    .ring-box { width: 100%; }
+  }
+  @media (max-width: 600px) {
+    .show { min-height: 0; flex-direction: row; align-items: center; gap: 18px; padding: 20px; }
+    .show p, .chips { display: none; }
+    .star { width: 44px; flex-shrink: 0; }
+    .show .big { font-size: 40px; flex-direction: row; gap: 10px; }
+    .panel { justify-content: flex-start; }
+    .tile.back, .tile.here, .tile.out { padding: 0 12px; font-size: 14px; }
+    .actions .btn { flex: 1 1 auto; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition-duration: 1ms !important; }
+  }
+</style>
 </head>
 <body>
-  <main class="container">
-    <div class="topbar">
-      <a href="../index.html">← Back to AI Resume Analyzer</a>
-      <div class="topbar-right">
-        <button type="button" class="btn ghost" id="signout-btn" hidden>Sign out</button>
-        <button type="button" class="icon-btn" id="theme-toggle" aria-label="Toggle dark mode">🌓</button>
+<div class="page">
+  <div class="bar">
+    <nav aria-label="Admin">
+      <a class="tile logo" href="../" aria-label="Back to AI Resume Analyzer">
+        <svg viewBox="0 0 523 523" aria-hidden="true"><path fill="#111" d="M250.168 7.835c3.866-10.447 18.642-10.447 22.508 0l23.962 64.758c26.335 71.167 82.445 127.278 153.612 153.612l64.758 23.962c10.447 3.866 10.447 18.643 0 22.509l-64.757 23.962c-71.167 26.334-127.278 82.445-153.613 153.612l-23.962 64.757c-3.866 10.448-18.642 10.448-22.508 0l-23.963-64.757c-26.334-71.167-82.445-127.278-153.612-153.612L7.836 272.676c-10.447-3.866-10.447-18.643 0-22.509l64.757-23.962c71.167-26.334 127.278-82.445 153.612-153.612z"/></svg>
+      </a>
+      <a class="tile back" href="../"><span>← <span class="lbl-long">Back to </span>site</span></a>
+      <span class="tile here" aria-current="page">
+        <svg class="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+        Admin
+      </span>
+      <button type="button" class="tile out" id="signout-btn" hidden><span>Sign out</span></button>
+    </nav>
+  </div>
+
+  <!-- ================= Signed out ================= -->
+  <main class="split" id="login-view">
+    <section class="show" aria-labelledby="show-title">
+      <img src="../assets/card-2.jpg" alt="">
+      <span class="blob a" aria-hidden="true"></span>
+      <span class="blob b" aria-hidden="true"></span>
+      <span class="star" aria-hidden="true"></span>
+      <div>
+        <h1 class="big" id="show-title"><span>Admin</span><span class="dim">only</span></h1>
+        <p>Interview prep and project notes for the developer of AI Resume Analyzer. Everything you write here is saved to your account on AWS.</p>
+        <div class="chips">
+          <span class="chip"><i></i>Amazon Cognito sign-in</span>
+          <span class="chip"><i></i>Saved to DynamoDB</span>
+          <span class="chip"><i></i>Private to your account</span>
+        </div>
       </div>
-    </div>
-
-    <header class="page-header">
-      <span class="eyebrow">🔒 Developer only</span>
-      <h1>Interview Prep</h1>
-      <p>Questions about this project for Cloud Engineer and Software Developer roles. Your answers are saved to AWS.</p>
-    </header>
-
-    <!-- Sign in -->
-    <section id="login-view" class="card login" hidden>
-      <h2>Sign in</h2>
-      <p class="muted small" id="login-message">This page is only for the project's developer.</p>
-      <form id="login-form" novalidate>
-        <label for="login-email">Email</label>
-        <input type="email" id="login-email" autocomplete="username" required>
-        <label for="login-password">Password</label>
-        <input type="password" id="login-password" autocomplete="current-password" required>
-        <button type="submit" class="btn primary" id="login-btn">Sign in</button>
-        <p class="error" id="login-error" role="alert" hidden></p>
-      </form>
     </section>
 
-    <!-- App -->
-    <section id="app-view" hidden>
-      <nav class="tabs card" role="tablist" aria-label="Role">
-        <button class="tab" role="tab" data-tab="cloud" aria-selected="true">☁️ Cloud Engineer <span class="count" id="count-cloud"></span></button>
-        <button class="tab" role="tab" data-tab="dev" aria-selected="false">💻 Software Developer <span class="count" id="count-dev"></span></button>
-        <button class="tab" role="tab" data-tab="all" aria-selected="false">📚 All questions <span class="count" id="count-all"></span></button>
-      </nav>
-
-      <section class="toolbar card" aria-label="Filters and actions">
-        <div class="filters">
-          <input type="search" class="search" id="search" placeholder="Search questions and answers… (press / to focus)" aria-label="Search">
-          <select id="category" aria-label="Category"><option value="">All categories</option></select>
-          <select id="difficulty" aria-label="Difficulty">
-            <option value="">All difficulties</option><option>Easy</option><option>Medium</option><option>Hard</option>
-          </select>
+    <section class="panel fade-in" aria-labelledby="signin-title">
+      <span class="preview-tag" id="preview-tag" hidden>Preview mode · test account: admin@preview.dev / Preview-2026</span>
+      <div class="panel-head">
+        <span class="lock-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.2" fill="currentColor" stroke="none"/></svg></span>
+        <h2 id="signin-title">Sign in</h2>
+        <p class="sub" id="login-sub">Use the admin account created for this project.</p>
+      </div>
+      <form class="login-form" id="login-form" novalidate>
+        <div class="field">
+          <label for="email">Email</label>
+          <div class="input"><input type="email" id="email" autocomplete="username" placeholder="you@example.com" required></div>
         </div>
-        <div class="toggles">
-          <label><input type="checkbox" id="shared-only"> ↔ Only questions similar across both roles</label>
-          <label><input type="checkbox" id="hide-practiced"> Hide practiced</label>
-        </div>
-        <div class="actions">
-          <button type="button" class="btn primary" id="practice-btn">🎯 Practice mode</button>
-          <button type="button" class="btn" id="add-btn">＋ Add question</button>
-          <button type="button" class="btn ghost" id="backup-btn">⇩ Download backup</button>
-          <span class="spacer"></span>
-          <button type="button" class="btn ghost" id="expand-btn">Expand all</button>
-          <button type="button" class="btn ghost" id="collapse-btn">Collapse all</button>
-        </div>
-        <div class="progress-wrap">
-          <div class="progress-label">
-            <span id="progress-text">0 of 0 practiced</span>
-            <span><span class="save-status" id="save-status"></span> · <span id="progress-pct">0%</span></span>
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="input has-toggle">
+            <input type="password" id="password" autocomplete="current-password" placeholder="••••••••••••" required>
+            <button type="button" class="toggle" id="toggle-pw" aria-controls="password" aria-pressed="false">Show</button>
           </div>
-          <div class="progress"><div class="progress-fill" id="progress-fill"></div></div>
         </div>
-      </section>
-
-      <section class="list" id="list" aria-live="polite"></section>
+        <p class="error" id="login-error" role="alert"></p>
+        <button type="submit" class="btn primary submit" id="login-btn"><span>Sign in</span></button>
+      </form>
+      <p class="fine">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg>
+        There's no public sign-up. Admin accounts are created by the developer, and sessions end after an hour or when you close the tab.
+      </p>
     </section>
   </main>
 
-  <!-- Practice mode -->
-  <dialog id="practice-dialog" aria-labelledby="practice-title">
-    <div class="dialog-inner">
-      <div class="dialog-head">
-        <h2 id="practice-title">🎯 Practice mode</h2>
-        <button type="button" class="close-x" data-close aria-label="Close">×</button>
+  <!-- ================= Signed in: interview prep ================= -->
+  <main class="app" id="app-view" hidden>
+    <header class="app-head">
+      <div>
+        <h1 class="big"><span>Interview</span><span class="dim">prep</span></h1>
+        <p>Questions about this project for Cloud Engineer and Software Developer roles. Write your own answers; they save automatically.</p>
       </div>
-      <div class="q-meta" id="practice-meta"></div>
-      <p class="practice-q" id="practice-question"></p>
-      <p class="muted small" id="practice-hint">Answer out loud first, then reveal the guide.</p>
-      <div class="practice-answer" id="practice-answer" hidden></div>
-      <div class="dialog-actions">
-        <button type="button" class="btn ghost" id="practice-done">✓ Mark practiced</button>
-        <button type="button" class="btn" id="practice-reveal">Reveal answer</button>
-        <button type="button" class="btn primary" id="practice-next">Next question →</button>
+      <div class="ring-box">
+        <div class="ring">
+          <svg viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ddd6fe"/><stop offset="100%" stop-color="#9a73f0"/></linearGradient></defs><circle class="track" cx="50" cy="50" r="42"></circle><circle class="fill" id="ring-fill" cx="50" cy="50" r="42"></circle></svg>
+          <b id="ring-pct">0%</b>
+        </div>
+        <div><strong id="ring-text">0 of 0 practiced</strong><span class="save" id="save-status">Loading…</span></div>
       </div>
+    </header>
+
+    <div class="seg no-anim" id="seg" role="tablist" aria-label="Role">
+      <span class="seg-ind" aria-hidden="true"></span>
+      <button type="button" role="tab" data-tab="cloud" class="on"><b>Cloud Engineer</b><small id="c-cloud"></small></button>
+      <button type="button" role="tab" data-tab="dev"><b>Software Developer</b><small id="c-dev"></small></button>
+      <button type="button" role="tab" data-tab="all"><b>All questions</b><small id="c-all"></small></button>
     </div>
-  </dialog>
 
-  <!-- Add / edit question -->
-  <dialog id="edit-dialog" aria-labelledby="edit-title">
-    <form class="dialog-inner" id="edit-form" novalidate>
-      <div class="dialog-head">
-        <h2 id="edit-title">＋ Add a question</h2>
-        <button type="button" class="close-x" data-close aria-label="Close">×</button>
+    <section class="toolbar" aria-label="Filters and actions">
+      <div class="filters">
+        <input type="search" class="search" id="search" placeholder="Search questions, answers and notes…  ( / )" aria-label="Search">
+        <select id="category" aria-label="Category"><option value="">All categories</option></select>
+        <select id="difficulty" aria-label="Difficulty"><option value="">All levels</option><option>Easy</option><option>Medium</option><option>Hard</option></select>
       </div>
-      <div class="form-grid">
-        <div>
-          <label for="f-role">Role</label>
-          <select id="f-role"><option value="cloud">Cloud Engineer</option><option value="dev">Software Developer</option></select>
+      <div class="tool-row">
+        <div class="checks">
+          <label class="check"><input type="checkbox" id="shared-only"> Similar in both roles</label>
+          <label class="check"><input type="checkbox" id="hide-done"> Hide practiced</label>
         </div>
-        <div>
-          <label for="f-difficulty">Difficulty</label>
-          <select id="f-difficulty"><option>Easy</option><option selected>Medium</option><option>Hard</option></select>
-        </div>
-        <div class="full">
-          <label for="f-category">Category</label>
-          <input type="text" id="f-category" list="category-list" placeholder="e.g. Security" maxlength="40">
-          <datalist id="category-list"></datalist>
-        </div>
-        <div class="full">
-          <label for="f-question">Question</label>
-          <input type="text" id="f-question" maxlength="300">
-        </div>
-        <div class="full">
-          <label for="f-points">Key points to cover <span class="muted">(one per line; wrap code in `backticks`)</span></label>
-          <textarea id="f-points" rows="6"></textarea>
-        </div>
-        <div class="full">
-          <label for="f-project">In your project <span class="muted">(optional)</span></label>
-          <textarea id="f-project" rows="2" maxlength="600"></textarea>
-        </div>
-        <div class="full">
-          <label for="f-tip">Tip <span class="muted">(optional)</span></label>
-          <input type="text" id="f-tip" maxlength="400">
-        </div>
-        <div class="full">
-          <label for="f-similar">Similar question in the other role <span class="muted">(optional)</span></label>
-          <select id="f-similar"><option value="">None</option></select>
+        <div class="actions">
+          <button type="button" class="btn primary" id="practice-btn">Practice mode</button>
+          <button type="button" class="btn" id="add-btn">+ Add question</button>
+          <button type="button" class="btn" id="expand-btn">Expand all</button>
+          <button type="button" class="btn" id="backup-btn" hidden>Download backup</button>
         </div>
       </div>
-      <p class="error" id="edit-error" role="alert" hidden></p>
-      <div class="dialog-actions">
-        <button type="button" class="btn ghost" data-close>Cancel</button>
-        <button type="submit" class="btn primary" id="edit-save">Save question</button>
-      </div>
-    </form>
-  </dialog>
+    </section>
 
-  <script src="../config.js"></script>
-  <script>
-    // ---------- Settings ----------
-    const CONFIG = window.APP_CONFIG || {};
-    const API = (CONFIG.API_BASE_URL || "").replace(/\/$/, "");
-    const COGNITO_REGION = CONFIG.COGNITO_REGION || "us-east-1";
-    const COGNITO_CLIENT_ID = CONFIG.COGNITO_CLIENT_ID || "";
-    const TOKEN_KEY = "devPortal.idToken";
-    const NOTES_SAVE_DELAY_MS = 800;
-    const ROLES = { cloud: { name: "Cloud Engineer", short: "CE", prefix: "ce" }, dev: { name: "Software Developer", short: "SD", prefix: "se" } };
-    const REDUCED_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    <section class="list" id="list" aria-live="polite"><div class="empty">Loading your questions…</div></section>
+  </main>
+</div>
 
-    // ---------- Helpers ----------
-    const $ = (id) => document.getElementById(id);
+<!-- Practice overlay -->
+<div class="overlay" id="practice" hidden role="dialog" aria-modal="true" aria-labelledby="practice-title">
+  <div class="sheet">
+    <div class="sheet-head"><h2 id="practice-title">Practice mode</h2><button type="button" class="x" data-close aria-label="Close">×</button></div>
+    <div class="practice-card">
+      <div class="meta" id="p-meta"></div>
+      <p class="practice-q" id="p-question"></p>
+      <p class="practice-hint" id="p-hint">Answer out loud first, then reveal the guide.</p>
+    </div>
+    <div class="practice-answer" id="p-answer" hidden></div>
+    <div class="row-end">
+      <button type="button" class="btn" id="p-done">Mark practiced</button>
+      <button type="button" class="btn" id="p-reveal">Reveal answer</button>
+      <button type="button" class="btn primary" id="p-next">Next question →</button>
+    </div>
+  </div>
+</div>
 
-    function el(tag, props = {}, ...children) {
-      const node = document.createElement(tag);
-      for (const [key, value] of Object.entries(props)) {
-        if (value == null || value === false) continue;
-        if (key === "class") node.className = value;
-        else if (key === "text") node.textContent = value;
-        else if (key.startsWith("on")) node.addEventListener(key.slice(2), value);
-        else node.setAttribute(key, value === true ? "" : value);
-      }
-      for (const child of children.flat()) if (child != null && child !== false) node.append(child);
-      return node;
+<!-- Add / edit overlay -->
+<div class="overlay" id="editor" hidden role="dialog" aria-modal="true" aria-labelledby="edit-title">
+  <form class="sheet" id="edit-form" novalidate>
+    <div class="sheet-head"><h2 id="edit-title">Add a question</h2><button type="button" class="x" data-close aria-label="Close">×</button></div>
+    <div class="form-grid">
+      <div class="field"><label for="f-role">Role</label><select id="f-role"><option value="cloud">Cloud Engineer</option><option value="dev">Software Developer</option></select></div>
+      <div class="field"><label for="f-difficulty">Difficulty</label><select id="f-difficulty"><option>Easy</option><option selected>Medium</option><option>Hard</option></select></div>
+      <div class="field full"><label for="f-category">Category</label><input type="text" id="f-category" list="category-list" maxlength="40" placeholder="e.g. Security"><datalist id="category-list"></datalist></div>
+      <div class="field full"><label for="f-question">Question</label><input type="text" id="f-question" maxlength="300"></div>
+      <div class="field full"><label for="f-points">Key points (one per line, `backticks` for code)</label><textarea id="f-points" rows="5"></textarea></div>
+      <div class="field full"><label for="f-project">In your project (optional)</label><textarea id="f-project" rows="2" maxlength="600"></textarea></div>
+      <div class="field full"><label for="f-tip">Tip (optional)</label><input type="text" id="f-tip" maxlength="400"></div>
+      <div class="field full"><label for="f-similar">Similar question in the other role (optional)</label><select id="f-similar"><option value="">None</option></select></div>
+    </div>
+    <p class="error" id="edit-error" role="alert"></p>
+    <div class="row-end">
+      <button type="button" class="btn" data-close>Cancel</button>
+      <button type="submit" class="btn primary" id="edit-save">Save question</button>
+    </div>
+  </form>
+</div>
+
+<script src="../config.js"></script>
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const CFG = window.APP_CONFIG || {};
+  const REGION = CFG.COGNITO_REGION || "us-east-1";
+  const CLIENT_ID = CFG.COGNITO_CLIENT_ID || "";
+  const API = (CFG.API_BASE_URL || "").replace(/\/$/, "");
+  // Preview mode only when there is no config.js at all (the claude.ai preview).
+  // On the real site a missing setting blocks sign-in instead of falling back to preview.
+  const DEMO = !window.APP_CONFIG;
+  const SETUP_MISSING = !DEMO && (!CLIENT_ID || !API);
+  // Preview-only test account: checked in the browser, so it protects nothing real.
+  // The real site checks every sign-in with Amazon Cognito.
+  const PREVIEW_EMAIL = "admin@preview.dev", PREVIEW_PASSWORD = "Preview-2026";
+  const TOKEN_KEY = "devPortal.idToken", EMAIL_KEY = "devPortal.email", DEMO_KEY = "prepPreview.v1";
+  const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const ROLES = { cloud: { name: "Cloud Engineer", short: "CE", prefix: "ce" }, dev: { name: "Software Developer", short: "SD", prefix: "se" } };
+
+  // ---------- Small helpers ----------
+  function el(tag, props = {}, ...kids) {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(props)) {
+      if (v == null || v === false) continue;
+      if (k === "class") n.className = v;
+      else if (k === "text") n.textContent = v;
+      else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+      else n.setAttribute(k, v === true ? "" : v);
     }
+    for (const c of kids.flat()) if (c != null && c !== false) n.append(c);
+    return n;
+  }
+  function rich(text) { // `code` spans, everything else as plain text
+    const f = document.createDocumentFragment();
+    String(text || "").split("`").forEach((part, i) => f.append(i % 2 ? el("code", { text: part }) : document.createTextNode(part)));
+    return f;
+  }
+  function session(key, value) {
+    try { if (value === undefined) return sessionStorage.getItem(key); if (value === null) sessionStorage.removeItem(key); else sessionStorage.setItem(key, value); } catch { return null; }
+  }
+  function toast(msg) { const t = el("div", { class: "toast", role: "status", text: msg }); document.body.append(t); setTimeout(() => t.remove(), 2200); }
+  const chevron = () => { const s = document.createElementNS("http://www.w3.org/2000/svg", "svg"); s.setAttribute("viewBox", "0 0 24 24"); s.setAttribute("class", "chev"); s.setAttribute("aria-hidden", "true"); s.innerHTML = '<path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>'; return s; };
 
-    // `backtick` segments become <code>; everything is inserted as text, never HTML
-    function rich(text) {
-      const fragment = document.createDocumentFragment();
-      String(text || "").split("`").forEach((part, i) => {
-        fragment.append(i % 2 ? el("code", { text: part }) : document.createTextNode(part));
-      });
-      return fragment;
-    }
-
-    function storage(kind, key, value) {
-      try {
-        const s = kind === "session" ? sessionStorage : localStorage;
-        if (value === undefined) return s.getItem(key);
-        if (value === null) s.removeItem(key); else s.setItem(key, value);
-      } catch { return null; }
-    }
-
-    // ---------- Sign in with Amazon Cognito ----------
-    async function signIn(email, password) {
-      const res = await fetch(`https://cognito-idp.${COGNITO_REGION}.amazonaws.com/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-amz-json-1.1",
-          "X-Amz-Target": "AWSCognitoIdentityProviderService.InitiateAuth",
-        },
-        body: JSON.stringify({
-          AuthFlow: "USER_PASSWORD_AUTH",
-          ClientId: COGNITO_CLIENT_ID,
-          AuthParameters: { USERNAME: email, PASSWORD: password },
-        }),
-      });
-      let body = {};
-      try { body = await res.json(); } catch { /* no body */ }
-      if (!res.ok) {
-        const type = String(body.__type || "");
-        if (type.includes("NotAuthorized") || type.includes("UserNotFound")) throw new Error("Incorrect email or password.");
-        if (type.includes("TooManyRequests")) throw new Error("Too many attempts. Wait a minute and try again.");
-        throw new Error(body.message || `Sign-in failed (${res.status}).`);
-      }
-      if (body.ChallengeName === "NEW_PASSWORD_REQUIRED") {
-        throw new Error("This account still has a temporary password. Run the 'admin-set-user-password' command from DEVELOPER.md, then sign in.");
-      }
-      if (body.ChallengeName) throw new Error(`Unsupported sign-in step: ${body.ChallengeName}`);
-      storage("session", TOKEN_KEY, body.AuthenticationResult.IdToken);
-    }
-
-    function signOut(message) {
-      storage("session", TOKEN_KEY, null);
-      questions = [];
-      showLogin(message);
-    }
-
-    // ---------- API ----------
-    class AuthError extends Error {}
-
-    async function api(method, path, body) {
-      const res = await fetch(API + path, {
-        method,
-        headers: { "Content-Type": "application/json", Authorization: storage("session", TOKEN_KEY) || "" },
-        body: body === undefined ? undefined : JSON.stringify(body),
-      });
-      if (res.status === 401 || res.status === 403) {
-        signOut("Your session has expired. Please sign in again.");
-        throw new AuthError("Signed out");
-      }
-      let data = {};
-      try { data = await res.json(); } catch { /* no body */ }
-      if (res.status === 429) throw new Error("Too many requests. Wait a moment and try again.");
-      if (!res.ok) throw new Error(data.error || data.message || `Request failed (${res.status})`);
-      return data;
-    }
-
-    // ---------- Save status ----------
-    let pendingSaves = 0;
-    function setSaveStatus(kind, message) {
-      const status = $("save-status");
-      status.className = `save-status ${kind}`;
-      status.textContent = message;
-    }
-    async function trackSave(promise) {
-      pendingSaves += 1;
-      setSaveStatus("saving", "Saving…");
-      try {
-        const result = await promise;
-        pendingSaves -= 1;
-        if (!pendingSaves) setSaveStatus("saved", "All changes saved to AWS ✓");
-        return result;
-      } catch (error) {
-        pendingSaves -= 1;
-        if (!(error instanceof AuthError)) setSaveStatus("failed", `Not saved: ${error.message}`);
-        throw error;
-      }
-    }
-    window.addEventListener("beforeunload", (event) => {
-      if (pendingSaves || notesTimers.size) { event.preventDefault(); event.returnValue = ""; }
+  // ================= Sign in =================
+  function tokenValid(token) {
+    if (!token) return false;
+    if (token === "preview") return DEMO;
+    try { const p = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))); return p.exp * 1000 > Date.now() + 30000; } catch { return false; }
+  }
+  async function cognitoSignIn(email, password) {
+    const res = await fetch(`https://cognito-idp.${REGION}.amazonaws.com/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-amz-json-1.1", "X-Amz-Target": "AWSCognitoIdentityProviderService.InitiateAuth" },
+      body: JSON.stringify({ AuthFlow: "USER_PASSWORD_AUTH", ClientId: CLIENT_ID, AuthParameters: { USERNAME: email, PASSWORD: password } }),
     });
-
-    // ---------- Data ----------
-    let questions = [];
-
-    function normalize(q) {
-      return { ...q, id: q.questionId || q.id, points: q.points || [], practiced: Boolean(q.practiced), notes: q.notes || "" };
+    let body = {}; try { body = await res.json(); } catch {}
+    if (!res.ok) {
+      const type = String(body.__type || "");
+      if (type.includes("NotAuthorized") || type.includes("UserNotFound")) throw new Error("Incorrect email or password.");
+      if (type.includes("TooManyRequests") || type.includes("LimitExceeded")) throw new Error("Too many attempts. Wait a minute, then try again.");
+      throw new Error(body.message || `Sign-in failed (${res.status}). Please try again.`);
     }
+    if (body.ChallengeName === "NEW_PASSWORD_REQUIRED") throw new Error("This account still has a temporary password. Set a permanent one with the command in DEVELOPER.md, then sign in.");
+    if (body.ChallengeName) throw new Error(`This account needs an extra sign-in step (${body.ChallengeName}) that this page doesn't support yet.`);
+    return body.AuthenticationResult.IdToken;
+  }
+  function loginFail(msg) { $("login-error").textContent = msg; const f = $("login-form"); f.classList.remove("shake"); void f.offsetWidth; f.classList.add("shake"); }
+  function showLogin(message) {
+    $("app-view").hidden = true; $("signout-btn").hidden = true; $("login-view").hidden = false;
+    $("login-sub").textContent = message || "Use the admin account created for this project.";
+    $("password").value = ""; $("email").focus();
+  }
+  function signOut(message) { session(TOKEN_KEY, null); session(EMAIL_KEY, null); questions = []; closeOverlays(); showLogin(message); }
 
-    function sortQuestions() {
-      const roleOrder = { cloud: 0, dev: 1 };
-      questions.sort((a, b) => (roleOrder[a.role] - roleOrder[b.role]) || ((a.order || 0) - (b.order || 0)) || a.question.localeCompare(b.question));
-    }
-
-    const findQuestion = (id) => questions.find((q) => q.id === id);
-
-    function similarMap() {
-      const map = {};
-      for (const q of questions) {
-        if (q.similar && findQuestion(q.similar)) {
-          map[q.id] = q.similar;
-          if (!map[q.similar]) map[q.similar] = q.id;
-        }
+  $("toggle-pw").addEventListener("click", () => {
+    const pw = $("password"), show = pw.type === "password";
+    pw.type = show ? "text" : "password"; $("toggle-pw").textContent = show ? "Hide" : "Show"; $("toggle-pw").setAttribute("aria-pressed", String(show)); pw.focus();
+  });
+  ["email", "password"].forEach((id) => $(id).addEventListener("input", () => ($("login-error").textContent = "")));
+  $("login-form").addEventListener("submit", async (e) => {
+    e.preventDefault(); $("login-error").textContent = "";
+    const email = $("email").value.trim(), password = $("password").value;
+    if (!email || !password) return loginFail("Enter your email and password.");
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return loginFail("That doesn't look like an email address.");
+    const btn = $("login-btn"); btn.disabled = true;
+    btn.replaceChildren(el("span", { class: "spinner" }), "Signing in…");
+    try {
+      let token;
+      if (DEMO) {
+        await new Promise((r) => setTimeout(r, 900));
+        if (email.toLowerCase() !== PREVIEW_EMAIL || password !== PREVIEW_PASSWORD) throw new Error("Incorrect email or password.");
+        token = "preview";
+      } else {
+        token = await cognitoSignIn(email, password);
       }
-      return map;
-    }
+      session(TOKEN_KEY, token); session(EMAIL_KEY, email);
+      await showApp();
+    } catch (err) { loginFail(err.message || "Sign-in failed. Please try again."); }
+    finally { btn.disabled = false; btn.replaceChildren(el("span", { text: "Sign in" })); }
+  });
+  $("signout-btn").addEventListener("click", () => signOut("You've signed out."));
 
-    function displayNumber(q) {
-      const sameRole = questions.filter((x) => x.role === q.role);
-      return `${ROLES[q.role].short} ${String(sameRole.indexOf(q) + 1).padStart(2, "0")}`;
+  // ================= Data layer =================
+  class AuthError extends Error {}
+  let demoData = null;
+  async function demoLoad() {
+    try { const saved = JSON.parse(localStorage.getItem(DEMO_KEY)); if (Array.isArray(saved) && saved.length) return saved; } catch {}
+    const res = await fetch("sample-questions.json");
+    const list = await res.json();
+    return list.map((q) => ({ questionId: q.id, ...q, practiced: false, notes: "" }));
+  }
+  function demoSave() { try { localStorage.setItem(DEMO_KEY, JSON.stringify(demoData)); } catch {} }
+  async function api(method, path, body) {
+    if (DEMO) {
+      if (!demoData) demoData = await demoLoad();
+      const id = path.split("/")[3];
+      if (method === "GET") return { questions: demoData };
+      const i = demoData.findIndex((q) => q.questionId === id);
+      if (method === "PATCH") { if (i < 0) throw new Error("Question not found"); Object.assign(demoData[i], body); }
+      if (method === "PUT") { const keep = i >= 0 ? { practiced: demoData[i].practiced, notes: demoData[i].notes } : { practiced: false, notes: "" }; const q = { questionId: id, ...body, ...keep }; if (i >= 0) demoData[i] = q; else demoData.push(q); demoSave(); return { question: q }; }
+      if (method === "DELETE") { if (i >= 0) demoData.splice(i, 1); }
+      demoSave(); return { ok: true };
     }
+    const res = await fetch(API + path, { method, headers: { "Content-Type": "application/json", Authorization: session(TOKEN_KEY) || "" }, body: body === undefined ? undefined : JSON.stringify(body) });
+    if (res.status === 401 || res.status === 403) { signOut("Your session has expired. Please sign in again."); throw new AuthError("Signed out"); }
+    let data = {}; try { data = await res.json(); } catch {}
+    if (res.status === 429) throw new Error("Too many requests. Wait a moment and try again.");
+    if (!res.ok) throw new Error(data.error || data.message || `Request failed (${res.status})`);
+    return data;
+  }
 
-    async function loadQuestions() {
-      $("list").replaceChildren(el("div", { class: "empty card", text: "Loading your questions from AWS…" }));
+  let pending = 0;
+  function setSave(kind, msg) { const s = $("save-status"); s.className = `save ${kind}`; s.textContent = msg; }
+  async function tracked(promise) {
+    pending++; setSave("saving", "Saving…");
+    try { const r = await promise; pending--; if (!pending) setSave("saved", DEMO ? "Saved in this browser (preview)" : "All changes saved to AWS ✓"); return r; }
+    catch (e) { pending--; if (!(e instanceof AuthError)) setSave("failed", `Not saved: ${e.message}`); throw e; }
+  }
+  const noteTimers = new Map();
+  addEventListener("beforeunload", (e) => { if (pending || noteTimers.size) { e.preventDefault(); e.returnValue = ""; } });
+
+  // ================= App state =================
+  let questions = [];
+  const state = { tab: "cloud", search: "", category: "", difficulty: "", shared: false, hideDone: false, open: new Set(), confirming: null };
+  const normalize = (q) => ({ ...q, id: q.questionId || q.id, points: q.points || [], practiced: !!q.practiced, notes: q.notes || "" });
+  const find = (id) => questions.find((q) => q.id === id);
+  function sortQs() { const o = { cloud: 0, dev: 1 }; questions.sort((a, b) => (o[a.role] - o[b.role]) || ((a.order || 0) - (b.order || 0)) || a.question.localeCompare(b.question)); }
+  function simMap() { const m = {}; for (const q of questions) if (q.similar && find(q.similar)) { m[q.id] = q.similar; if (!m[q.similar]) m[q.similar] = q.id; } return m; }
+  function number(q) { const same = questions.filter((x) => x.role === q.role); return `${ROLES[q.role].short} ${String(same.indexOf(q) + 1).padStart(2, "0")}`; }
+  function filtered() {
+    const sims = simMap(), term = state.search.trim().toLowerCase();
+    return questions.filter((q) => {
+      if (state.tab !== "all" && q.role !== state.tab) return false;
+      if (state.category && q.category !== state.category) return false;
+      if (state.difficulty && q.difficulty !== state.difficulty) return false;
+      if (state.shared && !sims[q.id]) return false;
+      if (state.hideDone && q.practiced) return false;
+      if (term && ![q.question, q.category, q.project, q.tip, q.notes, ...q.points].join(" ").toLowerCase().includes(term)) return false;
+      return true;
+    });
+  }
+
+  async function showApp() {
+    $("login-view").hidden = true; $("app-view").hidden = false; $("signout-btn").hidden = false;
+    $("backup-btn").hidden = DEMO;
+    $("app-view").classList.remove("fade-in"); void $("app-view").offsetWidth; $("app-view").classList.add("fade-in");
+    try { localStorage.setItem("devLink", "1"); } catch {}
+    $("list").replaceChildren(el("div", { class: "empty", text: "Loading your questions…" }));
+    try {
       const data = await api("GET", "/prep/questions");
-      questions = (data.questions || []).map(normalize);
-      sortQuestions();
-      storage("local", "devLink", "1");   // show the footer link on the main app in this browser
-      renderCategoryOptions();
-      render();
-      setSaveStatus("saved", "Loaded from AWS ✓");
+      questions = (data.questions || []).map(normalize); sortQs();
+      fillCategories(); render(); placeSeg();
+      setSave("saved", DEMO ? "Preview · changes stay in this browser" : "Loaded from AWS ✓");
+    } catch (e) {
+      if (!(e instanceof AuthError)) $("list").replaceChildren(el("div", { class: "empty", text: `Couldn't load your questions: ${e.message}` }));
     }
+  }
 
-    // ---------- Views ----------
-    function showLogin(message) {
-      $("app-view").hidden = true;
-      $("signout-btn").hidden = true;
-      $("login-view").hidden = false;
-      $("login-message").textContent = message || "This page is only for the project's developer.";
-      $("login-password").value = "";
-      $("login-email").focus();
-    }
+  // ================= Rendering =================
+  function fillCategories() {
+    const cats = [...new Set(questions.map((q) => q.category))].sort();
+    const sel = $("category"), cur = sel.value;
+    sel.replaceChildren(el("option", { value: "", text: "All categories" }), ...cats.map((c) => el("option", { value: c, text: c })));
+    sel.value = cats.includes(cur) ? cur : "";
+    $("category-list").replaceChildren(...cats.map((c) => el("option", { value: c })));
+  }
+  function renderStats() {
+    const n = (r) => questions.filter((q) => r === "all" || q.role === r).length;
+    $("c-cloud").textContent = `${n("cloud")} questions`; $("c-dev").textContent = `${n("dev")} questions`; $("c-all").textContent = `${n("all")} questions`;
+    const scope = questions.filter((q) => state.tab === "all" || q.role === state.tab), done = scope.filter((q) => q.practiced).length;
+    const pct = scope.length ? Math.round((done / scope.length) * 100) : 0, C = 2 * Math.PI * 42;
+    const f = $("ring-fill"); f.style.strokeDasharray = C; f.style.strokeDashoffset = C * (1 - pct / 100);
+    $("ring-pct").textContent = `${pct}%`; $("ring-text").textContent = `${done} of ${scope.length} practiced`;
+  }
 
-    async function showApp() {
-      $("login-view").hidden = true;
-      $("app-view").hidden = false;
-      $("signout-btn").hidden = false;
-      try {
-        await loadQuestions();
-      } catch (error) {
-        if (!(error instanceof AuthError)) {
-          $("list").replaceChildren(el("div", { class: "empty card", text: `Couldn't load questions: ${error.message}` }));
-        }
-      }
-    }
+  function saveNotes(q, value) {
+    clearTimeout(noteTimers.get(q.id)); noteTimers.delete(q.id);
+    q.notes = value;
+    tracked(api("PATCH", `/prep/questions/${q.id}`, { notes: value })).catch(() => {});
+  }
 
-    // ---------- Filters ----------
-    const state = { tab: "cloud", search: "", category: "", difficulty: "", sharedOnly: false, hidePracticed: false, open: new Set() };
+  function card(q, sims) {
+    const open = state.open.has(q.id), simQ = sims[q.id] ? find(sims[q.id]) : null;
+    const meta = el("div", { class: "meta" },
+      state.tab === "all" ? el("span", { class: `tag role-${q.role}`, text: ROLES[q.role].name }) : null,
+      el("span", { class: "tag", text: q.category }),
+      el("span", { class: `tag ${q.difficulty}` }, el("span", { class: "dot" }), q.difficulty),
+      simQ ? el("span", { class: "tag sim", text: `↔ ${number(simQ)}` }) : null,
+      q.custom ? el("span", { class: "tag", text: "Yours" }) : null,
+      q.notes ? el("span", { class: "tag", text: "Has notes" }) : null);
 
-    function filteredQuestions() {
-      const sims = similarMap();
-      const term = state.search.trim().toLowerCase();
-      return questions.filter((q) => {
-        if (state.tab !== "all" && q.role !== state.tab) return false;
-        if (state.category && q.category !== state.category) return false;
-        if (state.difficulty && q.difficulty !== state.difficulty) return false;
-        if (state.sharedOnly && !sims[q.id]) return false;
-        if (state.hidePracticed && q.practiced) return false;
-        if (term) {
-          const haystack = [q.question, q.category, q.project, q.tip, q.notes, ...q.points].join(" ").toLowerCase();
-          if (!haystack.includes(term)) return false;
-        }
-        return true;
-      });
-    }
-
-    // ---------- Rendering ----------
-    function renderCategoryOptions() {
-      const categories = [...new Set(questions.map((q) => q.category))].sort();
-      const select = $("category");
-      const current = select.value;
-      select.replaceChildren(el("option", { value: "", text: "All categories" }), ...categories.map((c) => el("option", { value: c, text: c })));
-      select.value = categories.includes(current) ? current : "";
-      $("category-list").replaceChildren(...categories.map((c) => el("option", { value: c })));
-    }
-
-    function renderCounts() {
-      $("count-cloud").textContent = `${questions.filter((q) => q.role === "cloud").length} questions`;
-      $("count-dev").textContent = `${questions.filter((q) => q.role === "dev").length} questions`;
-      $("count-all").textContent = `${questions.length} questions`;
-    }
-
-    function renderProgress() {
-      const scope = questions.filter((q) => state.tab === "all" || q.role === state.tab);
-      const done = scope.filter((q) => q.practiced).length;
-      const pct = scope.length ? Math.round((done / scope.length) * 100) : 0;
-      $("progress-text").textContent = `${done} of ${scope.length} practiced`;
-      $("progress-pct").textContent = `${pct}%`;
-      $("progress-fill").style.width = `${pct}%`;
-    }
-
-    const notesTimers = new Map();
-
-    function saveNotes(q, value) {
-      clearTimeout(notesTimers.get(q.id));
-      notesTimers.delete(q.id);
-      q.notes = value;
-      trackSave(api("PATCH", `/prep/questions/${q.id}`, { notes: value })).catch(() => {});
-    }
-
-    function buildCard(q, sims) {
-      const isOpen = state.open.has(q.id);
-      const similarQ = sims[q.id] ? findQuestion(sims[q.id]) : null;
-
-      const meta = el("div", { class: "q-meta" },
-        state.tab === "all" ? el("span", { class: `chip ${q.role}`, text: ROLES[q.role].name }) : null,
-        el("span", { class: "chip cat", text: q.category }),
-        el("span", { class: `chip ${q.difficulty}`, text: q.difficulty }),
-        similarQ ? el("span", { class: "chip similar", text: `↔ Similar: ${displayNumber(similarQ)}` }) : null,
-        q.custom ? el("span", { class: "chip custom", text: "Your question" }) : null,
-        q.notes ? el("span", { class: "chip custom", text: "📝 Notes" }) : null,
-      );
-
-      const checkbox = el("input", { type: "checkbox", "aria-label": "Mark as practiced" });
-      checkbox.checked = q.practiced;
-      checkbox.addEventListener("change", async () => {
-        const value = checkbox.checked;
-        q.practiced = value;
-        card.classList.toggle("is-practiced", value);
-        renderProgress();
-        try {
-          await trackSave(api("PATCH", `/prep/questions/${q.id}`, { practiced: value }));
-          if (state.hidePracticed && value) render();
-        } catch {
-          q.practiced = !value;
-          checkbox.checked = !value;
-          card.classList.toggle("is-practiced", !value);
-          renderProgress();
-        }
-      });
-
-      const toggle = el("button", { type: "button", class: "q-toggle", "aria-expanded": String(isOpen), "aria-controls": `body-${q.id}` },
-        el("span", { class: `q-num ${q.role}`, text: displayNumber(q) }),
-        el("div", { class: "q-main" }, el("p", { class: "q-title", text: q.question }), meta),
-        el("span", { class: "chev", "aria-hidden": "true", text: "▾" }),
-      );
-
-      const notes = el("textarea", { rows: "3", id: `notes-${q.id}`, maxlength: "5000", placeholder: "Your own answer, examples or reminders… (saved to AWS automatically)" });
-      notes.value = q.notes;
-      notes.addEventListener("input", () => {
-        clearTimeout(notesTimers.get(q.id));
-        setSaveStatus("saving", "Unsaved changes…");
-        notesTimers.set(q.id, setTimeout(() => saveNotes(q, notes.value), NOTES_SAVE_DELAY_MS));
-      });
-      notes.addEventListener("blur", () => {
-        if (notesTimers.has(q.id)) saveNotes(q, notes.value);
-      });
-
-      const body = el("div", { class: "q-body", id: `body-${q.id}`, hidden: !isOpen },
-        el("h4", { text: "Key points to cover" }),
-        el("ul", {}, q.points.map((p) => el("li", {}, rich(p)))),
-        q.project ? el("div", { class: "callout project" }, el("strong", { text: "📌 In your project" }), el("p", {}, rich(q.project))) : null,
-        q.tip ? el("div", { class: "callout tip" }, el("strong", { text: "💡 Tip" }), el("p", {}, rich(q.tip))) : null,
-        similarQ ? el("div", { class: "callout similar-box" },
-          el("div", {},
-            el("strong", { text: `↔ Similar question for ${ROLES[similarQ.role].name} (${displayNumber(similarQ)})` }),
-            el("p", { text: similarQ.question })),
-          el("button", { type: "button", class: "btn", text: "Go to it →", onclick: () => goToQuestion(similarQ.id) }),
-        ) : null,
-        el("label", { class: "notes-label", for: `notes-${q.id}`, text: "📝 Your answer / notes" }),
-        notes,
-        el("div", { class: "body-actions" },
-          el("button", { type: "button", class: "btn ghost", text: "✎ Edit question", onclick: () => openEditor(q) }),
-          el("button", { type: "button", class: "btn danger", text: "Delete", onclick: () => deleteQuestion(q) }),
-        ),
-      );
-
-      toggle.addEventListener("click", () => {
-        const nowOpen = body.hidden;
-        body.hidden = !nowOpen;
-        toggle.setAttribute("aria-expanded", String(nowOpen));
-        card.classList.toggle("open", nowOpen);
-        if (nowOpen) state.open.add(q.id); else state.open.delete(q.id);
-      });
-
-      const card = el("article", { class: `q-card card${isOpen ? " open" : ""}${q.practiced ? " is-practiced" : ""}`, id: `q-${q.id}` },
-        el("div", { class: "q-head" }, toggle, el("label", { class: "practiced-toggle" }, checkbox, "Practiced")),
-        body,
-      );
-      return card;
-    }
-
-    function render() {
-      document.querySelectorAll(".tab").forEach((t) => t.setAttribute("aria-selected", String(t.dataset.tab === state.tab)));
-      renderCounts();
-      renderProgress();
-      const sims = similarMap();
-      const items = filteredQuestions();
-      $("list").replaceChildren(...(items.length
-        ? items.map((q) => buildCard(q, sims))
-        : [el("div", { class: "empty card", text: questions.length ? "No questions match these filters." : "No questions yet. Run scripts/seed_prep.py or add one." })]));
-    }
-
-    function goToQuestion(id) {
-      const q = findQuestion(id);
-      if (!q) return;
-      if (state.tab !== "all") state.tab = q.role;
-      Object.assign(state, { search: "", category: "", difficulty: "", hidePracticed: false });
-      if (!similarMap()[id]) { state.sharedOnly = false; $("shared-only").checked = false; }
-      $("search").value = ""; $("category").value = ""; $("difficulty").value = "";
-      $("hide-practiced").checked = false;
-      state.open.add(id);
-      render();
-      const card = $(`q-${id}`);
-      if (!card) return;
-      card.scrollIntoView({ behavior: REDUCED_MOTION ? "auto" : "smooth", block: "center" });
-      card.classList.add("flash");
-      setTimeout(() => card.classList.remove("flash"), 1600);
-    }
-
-    // ---------- Add / edit / delete ----------
-    let editingId = null;
-
-    function fillSimilarOptions(selected) {
-      const role = $("f-role").value;
-      const others = questions.filter((q) => q.role !== role);
-      $("f-similar").replaceChildren(el("option", { value: "", text: "None" }),
-        ...others.map((q) => el("option", { value: q.id, text: `${displayNumber(q)} · ${q.question}` })));
-      $("f-similar").value = others.some((q) => q.id === selected) ? selected : "";
-    }
-
-    function openEditor(q) {
-      editingId = q ? q.id : null;
-      $("edit-form").reset();
-      $("edit-title").textContent = q ? "✎ Edit question" : "＋ Add a question";
-      $("f-role").value = q ? q.role : (state.tab === "dev" ? "dev" : "cloud");
-      $("f-difficulty").value = q ? q.difficulty : "Medium";
-      $("f-category").value = q ? q.category : "";
-      $("f-question").value = q ? q.question : "";
-      $("f-points").value = q ? q.points.join("\n") : "";
-      $("f-project").value = q ? q.project || "" : "";
-      $("f-tip").value = q ? q.tip || "" : "";
-      fillSimilarOptions(q ? q.similar : "");
-      $("edit-error").hidden = true;
-      $("edit-dialog").showModal();
-      $("f-question").focus();
-    }
-
-    $("add-btn").addEventListener("click", () => openEditor(null));
-    $("f-role").addEventListener("change", () => fillSimilarOptions($("f-similar").value));
-
-    $("edit-form").addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const existing = editingId ? findQuestion(editingId) : null;
-      const role = $("f-role").value;
-      const nextOrder = Math.max(0, ...questions.filter((q) => q.role === role).map((q) => q.order || 0)) + 1;
-      const payload = {
-        role,
-        difficulty: $("f-difficulty").value,
-        category: $("f-category").value.trim() || "General",
-        question: $("f-question").value.trim(),
-        points: $("f-points").value.split("\n").map((p) => p.trim()).filter(Boolean),
-        project: $("f-project").value.trim(),
-        tip: $("f-tip").value.trim(),
-        similar: $("f-similar").value,
-        order: existing && existing.role === role ? existing.order || nextOrder : nextOrder,
-        custom: existing ? Boolean(existing.custom) : true,
-      };
-      if (!payload.question || !payload.points.length) {
-        $("edit-error").textContent = "Please enter a question and at least one key point.";
-        $("edit-error").hidden = false;
-        return;
-      }
-      const id = editingId || `${ROLES[role].prefix}-c${Date.now().toString(36)}`;
-      $("edit-save").disabled = true;
-      try {
-        const data = await trackSave(api("PUT", `/prep/questions/${id}`, payload));
-        const saved = normalize(data.question);
-        questions = questions.filter((q) => q.id !== id).concat(saved);
-        sortQuestions();
-        $("edit-dialog").close();
-        renderCategoryOptions();
-        if (state.tab !== "all") state.tab = role;
-        goToQuestion(id);
-      } catch (error) {
-        if (!(error instanceof AuthError)) {
-          $("edit-error").textContent = error.message;
-          $("edit-error").hidden = false;
-        }
-      } finally {
-        $("edit-save").disabled = false;
-      }
+    const box = el("input", { type: "checkbox", "aria-label": `Mark "${q.question}" as practiced` });
+    box.checked = q.practiced;
+    box.addEventListener("change", async () => {
+      const v = box.checked; q.practiced = v; art.classList.toggle("done", v); renderStats();
+      try { await tracked(api("PATCH", `/prep/questions/${q.id}`, { practiced: v })); if (state.hideDone && v) render(); }
+      catch { q.practiced = !v; box.checked = !v; art.classList.toggle("done", !v); renderStats(); }
     });
 
-    async function deleteQuestion(q) {
-      if (!confirm(`Delete "${q.question}"?\nYour notes for it will be deleted too.`)) return;
-      try {
-        await trackSave(api("DELETE", `/prep/questions/${q.id}`));
-        questions = questions.filter((x) => x.id !== q.id);
-        state.open.delete(q.id);
-        renderCategoryOptions();
-        render();
-      } catch { /* status already shown */ }
-    }
-
-    // ---------- Practice mode ----------
-    let practiceCurrent = null;
-
-    function nextPractice() {
-      const pool = filteredQuestions();
-      if (!pool.length) {
-        practiceCurrent = null;
-        $("practice-meta").replaceChildren();
-        $("practice-question").textContent = "No questions match your current filters.";
-        $("practice-answer").hidden = true;
-        return;
-      }
-      let pick = pool[Math.floor(Math.random() * pool.length)];
-      if (pool.length > 1 && practiceCurrent && pick.id === practiceCurrent.id) pick = pool[(pool.indexOf(pick) + 1) % pool.length];
-      practiceCurrent = pick;
-      $("practice-meta").replaceChildren(
-        el("span", { class: `chip ${pick.role}`, text: ROLES[pick.role].name }),
-        el("span", { class: "chip cat", text: pick.category }),
-        el("span", { class: `chip ${pick.difficulty}`, text: pick.difficulty }),
-      );
-      $("practice-question").textContent = pick.question;
-      $("practice-answer").replaceChildren(
-        el("ul", {}, pick.points.map((p) => el("li", {}, rich(p)))),
-        pick.project ? el("div", { class: "callout project" }, el("strong", { text: "📌 In your project" }), el("p", {}, rich(pick.project))) : null,
-        pick.tip ? el("div", { class: "callout tip" }, el("strong", { text: "💡 Tip" }), el("p", {}, rich(pick.tip))) : null,
-        pick.notes ? el("div", { class: "callout similar-box" }, el("div", {}, el("strong", { text: "📝 Your notes" }), el("p", { text: pick.notes }))) : null,
-      );
-      $("practice-answer").hidden = true;
-      $("practice-hint").hidden = false;
-      $("practice-reveal").hidden = false;
-      $("practice-done").textContent = pick.practiced ? "✓ Practiced" : "✓ Mark practiced";
-    }
-
-    $("practice-btn").addEventListener("click", () => { nextPractice(); $("practice-dialog").showModal(); });
-    $("practice-next").addEventListener("click", nextPractice);
-    $("practice-reveal").addEventListener("click", () => {
-      $("practice-answer").hidden = false;
-      $("practice-hint").hidden = true;
-      $("practice-reveal").hidden = true;
-    });
-    $("practice-done").addEventListener("click", async () => {
-      const q = practiceCurrent;
-      if (!q || q.practiced) return;
-      q.practiced = true;
-      $("practice-done").textContent = "✓ Practiced";
-      try {
-        await trackSave(api("PATCH", `/prep/questions/${q.id}`, { practiced: true }));
-        render();
-      } catch {
-        q.practiced = false;
-        $("practice-done").textContent = "✓ Mark practiced";
-      }
+    const toggle = el("button", { type: "button", class: "q-toggle", "aria-expanded": String(open), "aria-controls": `b-${q.id}` },
+      el("span", { class: `num ${q.role}`, text: number(q) }),
+      el("span", { class: "q-main" }, el("span", { class: "q-title", style: "display:block", text: q.question }), meta),
+      chevron());
+    toggle.addEventListener("click", () => {
+      const now = !art.classList.contains("open");
+      art.classList.toggle("open", now); toggle.setAttribute("aria-expanded", String(now));
+      if (now) state.open.add(q.id); else state.open.delete(q.id);
     });
 
-    // ---------- Backup ----------
-    $("backup-btn").addEventListener("click", () => {
-      const backup = {
-        exportedAt: new Date().toISOString(),
-        questions: questions.map(({ id, ...rest }) => ({ questionId: id, ...rest })),
-      };
-      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
-      const link = el("a", { href: URL.createObjectURL(blob), download: `interview-prep-backup-${new Date().toISOString().slice(0, 10)}.json` });
-      document.body.append(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(link.href);
-    });
+    const notes = el("textarea", { id: `n-${q.id}`, rows: "3", maxlength: "5000", placeholder: "Write your answer in your own words. It saves as you type." });
+    notes.value = q.notes;
+    notes.addEventListener("input", () => { clearTimeout(noteTimers.get(q.id)); setSave("saving", "Unsaved changes…"); noteTimers.set(q.id, setTimeout(() => saveNotes(q, notes.value), 800)); });
+    notes.addEventListener("blur", () => { if (noteTimers.has(q.id)) saveNotes(q, notes.value); });
 
-    // ---------- Sign-in form ----------
-    $("login-form").addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const email = $("login-email").value.trim();
-      const password = $("login-password").value;
-      $("login-error").hidden = true;
-      if (!email || !password) {
-        $("login-error").textContent = "Enter your email and password.";
-        $("login-error").hidden = false;
-        return;
-      }
-      $("login-btn").disabled = true;
-      try {
-        await signIn(email, password);
-        $("login-password").value = "";
-        await showApp();
-      } catch (error) {
-        $("login-error").textContent = error.message;
-        $("login-error").hidden = false;
-      } finally {
-        $("login-btn").disabled = false;
-      }
-    });
+    const actions = state.confirming === q.id
+      ? el("div", { class: "row-end" }, el("span", { class: "confirm" }, "Delete this question and its notes?",
+          el("button", { type: "button", class: "btn small danger", text: "Delete", onclick: () => remove(q) }),
+          el("button", { type: "button", class: "btn small", text: "Keep it", onclick: () => { state.confirming = null; render(); } })))
+      : el("div", { class: "row-end" },
+          el("button", { type: "button", class: "btn small", text: "Edit question", onclick: () => openEditor(q) }),
+          el("button", { type: "button", class: "btn small danger", text: "Delete", onclick: () => { state.confirming = q.id; render(); } }));
 
-    $("signout-btn").addEventListener("click", () => signOut("You've signed out."));
+    const body = el("div", { class: "q-body", id: `b-${q.id}` }, el("div", { class: "q-inner" }, el("div", { class: "q-content" },
+      el("h4", { text: "Key points to cover" }),
+      el("ul", {}, q.points.map((p) => el("li", {}, rich(p)))),
+      q.project ? el("div", { class: "callout project" }, el("strong", { text: "In your project" }), el("p", {}, rich(q.project))) : null,
+      q.tip ? el("div", { class: "callout tip" }, el("strong", { text: "Tip" }), el("p", {}, rich(q.tip))) : null,
+      simQ ? el("div", { class: "callout sim" }, el("p", {}, el("strong", { text: `Similar for ${ROLES[simQ.role].name} · ${number(simQ)}` }), simQ.question),
+        el("button", { type: "button", class: "btn small", text: "Go to it →", onclick: () => goTo(simQ.id) })) : null,
+      el("div", { class: "notes-wrap" }, el("label", { class: "lab", for: `n-${q.id}`, text: "Your answer" }), notes),
+      actions)));
 
-    // ---------- Toolbar ----------
-    document.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", () => b.closest("dialog").close()));
-    document.querySelectorAll(".tab").forEach((tab) => tab.addEventListener("click", () => { state.tab = tab.dataset.tab; render(); }));
-    $("search").addEventListener("input", (e) => { state.search = e.target.value; render(); });
-    $("category").addEventListener("change", (e) => { state.category = e.target.value; render(); });
-    $("difficulty").addEventListener("change", (e) => { state.difficulty = e.target.value; render(); });
-    $("shared-only").addEventListener("change", (e) => { state.sharedOnly = e.target.checked; render(); });
-    $("hide-practiced").addEventListener("change", (e) => { state.hidePracticed = e.target.checked; render(); });
-    $("expand-btn").addEventListener("click", () => { filteredQuestions().forEach((q) => state.open.add(q.id)); render(); });
-    $("collapse-btn").addEventListener("click", () => { state.open.clear(); render(); });
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "/" && !$("app-view").hidden && !["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement.tagName)) {
-        e.preventDefault();
-        $("search").focus();
-      }
-    });
+    const art = el("article", { class: `q${open ? " open" : ""}${q.practiced ? " done" : ""}`, id: `q-${q.id}` },
+      el("div", { class: "q-head" }, toggle, el("label", { class: "tick" }, box, el("span", { text: "Practiced" }))), body);
+    return art;
+  }
 
-    // ---------- Theme (shared with the main app) ----------
-    $("theme-toggle").addEventListener("click", () => {
-      const explicit = document.documentElement.dataset.theme;
-      const current = explicit || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-      const next = current === "dark" ? "light" : "dark";
-      document.documentElement.dataset.theme = next;
-      storage("local", "theme", next);
-    });
+  function render() {
+    document.querySelectorAll("#seg button").forEach((b) => { b.classList.toggle("on", b.dataset.tab === state.tab); b.setAttribute("aria-selected", String(b.dataset.tab === state.tab)); });
+    renderStats();
+    const sims = simMap(), items = filtered();
+    $("list").replaceChildren(...(items.length ? items.map((q) => card(q, sims))
+      : [el("div", { class: "empty", text: questions.length ? "No questions match these filters." : "No questions yet. Add your first one." })]));
+    $("expand-btn").textContent = items.length && items.every((q) => state.open.has(q.id)) ? "Collapse all" : "Expand all";
+  }
 
-    // ---------- Start ----------
-    if (!API || !COGNITO_CLIENT_ID) {
-      showLogin("Setup needed: add COGNITO_CLIENT_ID to frontend/config.js (see DEVELOPER.md).");
-      $("login-btn").disabled = true;
-    } else if (storage("session", TOKEN_KEY)) {
-      showApp();
-    } else {
-      showLogin();
-    }
-  </script>
+  function goTo(id) {
+    const q = find(id); if (!q) return;
+    if (state.tab !== "all") state.tab = q.role;
+    Object.assign(state, { search: "", category: "", difficulty: "", hideDone: false });
+    if (!simMap()[id]) { state.shared = false; $("shared-only").checked = false; }
+    $("search").value = ""; $("category").value = ""; $("difficulty").value = ""; $("hide-done").checked = false;
+    state.open.add(id); render(); placeSeg();
+    const c = $(`q-${id}`); if (!c) return;
+    c.scrollIntoView({ behavior: REDUCED ? "auto" : "smooth", block: "center" });
+    c.classList.add("flash"); setTimeout(() => c.classList.remove("flash"), 1600);
+  }
+
+  async function remove(q) {
+    try {
+      await tracked(api("DELETE", `/prep/questions/${q.id}`));
+      questions = questions.filter((x) => x.id !== q.id); state.open.delete(q.id); state.confirming = null;
+      fillCategories(); render(); toast("Question deleted");
+    } catch {}
+  }
+
+  // ---------- Role switch (sliding highlight) ----------
+  const seg = $("seg"), segInd = seg.querySelector(".seg-ind");
+  function placeSeg() {
+    const b = seg.querySelector(`button[data-tab="${state.tab}"]`); if (!b) return;
+    segInd.style.width = b.offsetWidth + "px"; segInd.style.transform = `translateX(${b.offsetLeft}px)`;
+  }
+  seg.querySelectorAll("button").forEach((b) => b.addEventListener("click", () => { state.tab = b.dataset.tab; state.confirming = null; render(); placeSeg(); }));
+  addEventListener("resize", () => { seg.classList.add("no-anim"); placeSeg(); requestAnimationFrame(() => seg.classList.remove("no-anim")); });
+  (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => { placeSeg(); requestAnimationFrame(() => requestAnimationFrame(() => seg.classList.remove("no-anim"))); });
+
+  // ---------- Toolbar ----------
+  $("search").addEventListener("input", (e) => { state.search = e.target.value; render(); });
+  $("category").addEventListener("change", (e) => { state.category = e.target.value; render(); });
+  $("difficulty").addEventListener("change", (e) => { state.difficulty = e.target.value; render(); });
+  $("shared-only").addEventListener("change", (e) => { state.shared = e.target.checked; render(); });
+  $("hide-done").addEventListener("change", (e) => { state.hideDone = e.target.checked; render(); });
+  $("expand-btn").addEventListener("click", () => {
+    const items = filtered(), all = items.every((q) => state.open.has(q.id));
+    items.forEach((q) => (all ? state.open.delete(q.id) : state.open.add(q.id))); render();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeOverlays();
+    if (e.key === "/" && !$("app-view").hidden && !["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement.tagName)) { e.preventDefault(); $("search").focus(); }
+  });
+  $("backup-btn").addEventListener("click", () => {
+    const blob = new Blob([JSON.stringify({ exportedAt: new Date().toISOString(), questions: questions.map(({ id, ...r }) => ({ questionId: id, ...r })) }, null, 2)], { type: "application/json" });
+    const a = el("a", { href: URL.createObjectURL(blob), download: `interview-prep-backup-${new Date().toISOString().slice(0, 10)}.json` });
+    document.body.append(a); a.click(); a.remove(); URL.revokeObjectURL(a.href);
+  });
+
+  // ---------- Overlays ----------
+  let lastFocus = null;
+  function openOverlay(id) { lastFocus = document.activeElement; $(id).hidden = false; document.body.style.overflow = "hidden"; }
+  function closeOverlays() { ["practice", "editor"].forEach((id) => ($(id).hidden = true)); document.body.style.overflow = ""; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+  document.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", closeOverlays));
+  document.querySelectorAll(".overlay").forEach((o) => o.addEventListener("click", (e) => { if (e.target === o) closeOverlays(); }));
+
+  // Practice mode
+  let current = null;
+  function nextPractice() {
+    const pool = filtered();
+    if (!pool.length) { current = null; $("p-meta").replaceChildren(); $("p-question").textContent = "No questions match your current filters."; $("p-answer").hidden = true; return; }
+    let pick = pool[Math.floor(Math.random() * pool.length)];
+    if (pool.length > 1 && current && pick.id === current.id) pick = pool[(pool.indexOf(pick) + 1) % pool.length];
+    current = pick;
+    $("p-meta").replaceChildren(el("span", { class: "tag", text: ROLES[pick.role].name }), el("span", { class: "tag", text: pick.category }), el("span", { class: `tag ${pick.difficulty}` }, el("span", { class: "dot" }), pick.difficulty));
+    $("p-question").textContent = pick.question;
+    $("p-answer").replaceChildren(...[
+      el("ul", {}, pick.points.map((p) => el("li", {}, rich(p)))),
+      pick.project ? el("div", { class: "callout project" }, el("strong", { text: "In your project" }), el("p", {}, rich(pick.project))) : null,
+      pick.tip ? el("div", { class: "callout tip" }, el("strong", { text: "Tip" }), el("p", {}, rich(pick.tip))) : null,
+      pick.notes ? el("div", { class: "callout sim" }, el("p", {}, el("strong", { text: "Your answer" }), pick.notes)) : null].filter(Boolean));
+    $("p-answer").hidden = true; $("p-hint").hidden = false; $("p-reveal").hidden = false;
+    $("p-done").textContent = pick.practiced ? "✓ Practiced" : "Mark practiced";
+  }
+  $("practice-btn").addEventListener("click", () => { nextPractice(); openOverlay("practice"); $("p-reveal").focus(); });
+  $("p-next").addEventListener("click", nextPractice);
+  $("p-reveal").addEventListener("click", () => { $("p-answer").hidden = false; $("p-hint").hidden = true; $("p-reveal").hidden = true; });
+  $("p-done").addEventListener("click", async () => {
+    const q = current; if (!q || q.practiced) return;
+    q.practiced = true; $("p-done").textContent = "✓ Practiced";
+    try { await tracked(api("PATCH", `/prep/questions/${q.id}`, { practiced: true })); render(); } catch { q.practiced = false; $("p-done").textContent = "Mark practiced"; }
+  });
+
+  // Add / edit
+  let editingId = null;
+  function fillSimilar(selected) {
+    const role = $("f-role").value, others = questions.filter((q) => q.role !== role);
+    $("f-similar").replaceChildren(el("option", { value: "", text: "None" }), ...others.map((q) => el("option", { value: q.id, text: `${number(q)} · ${q.question}` })));
+    $("f-similar").value = others.some((q) => q.id === selected) ? selected : "";
+  }
+  function openEditor(q) {
+    editingId = q ? q.id : null;
+    $("edit-title").textContent = q ? "Edit question" : "Add a question";
+    $("f-role").value = q ? q.role : (state.tab === "dev" ? "dev" : "cloud");
+    $("f-difficulty").value = q ? q.difficulty : "Medium";
+    $("f-category").value = q ? q.category : "";
+    $("f-question").value = q ? q.question : "";
+    $("f-points").value = q ? q.points.join("\n") : "";
+    $("f-project").value = q ? q.project || "" : "";
+    $("f-tip").value = q ? q.tip || "" : "";
+    fillSimilar(q ? q.similar : ""); $("edit-error").textContent = "";
+    openOverlay("editor"); $("f-question").focus();
+  }
+  $("add-btn").addEventListener("click", () => openEditor(null));
+  $("f-role").addEventListener("change", () => fillSimilar($("f-similar").value));
+  $("edit-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const existing = editingId ? find(editingId) : null, role = $("f-role").value;
+    const nextOrder = Math.max(0, ...questions.filter((q) => q.role === role).map((q) => q.order || 0)) + 1;
+    const payload = {
+      role, difficulty: $("f-difficulty").value, category: $("f-category").value.trim() || "General",
+      question: $("f-question").value.trim(), points: $("f-points").value.split("\n").map((p) => p.trim()).filter(Boolean),
+      project: $("f-project").value.trim(), tip: $("f-tip").value.trim(), similar: $("f-similar").value,
+      order: existing && existing.role === role ? existing.order || nextOrder : nextOrder, custom: existing ? !!existing.custom : true,
+    };
+    if (!payload.question || !payload.points.length) { $("edit-error").textContent = "Add a question and at least one key point."; return; }
+    const id = editingId || `${ROLES[role].prefix}-c${Date.now().toString(36)}`;
+    $("edit-save").disabled = true;
+    try {
+      const data = await tracked(api("PUT", `/prep/questions/${id}`, payload));
+      questions = questions.filter((q) => q.id !== id).concat(normalize(data.question)); sortQs();
+      closeOverlays(); fillCategories(); if (state.tab !== "all") state.tab = role; goTo(id);
+      toast(editingId ? "Question updated" : "Question added");
+    } catch (err) { if (!(err instanceof AuthError)) $("edit-error").textContent = err.message; }
+    finally { $("edit-save").disabled = false; }
+  });
+
+  // ================= Start =================
+  $("preview-tag").hidden = !DEMO;
+  if (SETUP_MISSING) {
+    $("login-sub").textContent = "Sign-in isn't set up yet: add COGNITO_CLIENT_ID and API_BASE_URL to config.js (see DEVELOPER.md).";
+    $("login-btn").disabled = true;
+    session(TOKEN_KEY, null);
+  } else if (tokenValid(session(TOKEN_KEY))) showApp();
+  else { session(TOKEN_KEY, null); $("email").focus(); }
+})();
+</script>
+<script src="../assets/meteor-cursor.js" defer></script>
+<script src="../assets/site-prefs.js" data-theme-toggle="off" defer></script>
 </body>
 </html>
