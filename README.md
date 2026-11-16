@@ -108,6 +108,7 @@ CloudWatch: logs, metric filters, alarms → SNS email  ·  IAM: least-privilege
 - **Backend:** Python 3.11, boto3
 - **Frontend:** HTML, CSS and vanilla JavaScript (no framework), three.js 0.170 with custom GLSL shaders
 - **Version control:** Git and GitHub (feature branches and pull requests)
+  
 
 ## Project structure
 
