@@ -22,8 +22,6 @@ A cloud-native, serverless web app that helps students and professionals improve
 - [Roadmap](#roadmap)
 - [Credits](#credits)
   
-  
-
 ## Features
 
 - **ATS compatibility score** with section scores for formatting, skills, certifications and relevance
